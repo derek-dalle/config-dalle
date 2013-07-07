@@ -1,0 +1,11 @@
+# This file contains the list of core packages required for whatever the user
+# considers to be essential functionality.  Empty lines and lines beginning
+# with a character other than a lower-case letter or a numeral are ignored.
+#
+# Each package must be listed on a new line.
+#
+
+git
+build-essential
+vim
+

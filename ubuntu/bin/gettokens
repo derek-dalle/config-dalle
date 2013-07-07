@@ -1,0 +1,11 @@
+#!/bin/bash
+
+
+# First get the Kerberos version 5 tokens
+kinit -5 -l 30d "$USER@UMICH.EDU"
+
+# Then get the AFS tokens
+aklog -cell umich.edu
+
+# Now change the current directory to match that one.
+cd /afs/umich.edu/user/${USER:0:1}/${USER:1:1}/$USER

@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# This command sets the AFS access control lists recursively.
+find $1 -type d -exec fs setacl {} $2 $3 \;

@@ -1,0 +1,24 @@
+# This file contains the list packages that the user wishes to have installed
+# on all systems.
+#
+# Each package must be listed on a new line.
+#
+
+build-essential
+git
+gimp
+inkscape
+ipython
+jedit
+matlab-support
+nautilus-dropbox
+synapse
+texlive-full
+vim
+xubuntu-desktop
+
+krb5-user
+krb5-config
+openafs-krb5
+openafs-client
+openafs-modules-dkms

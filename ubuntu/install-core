@@ -1,0 +1,37 @@
+#!/bin/bash
+#
+# sudo install-core
+#
+# This function installs the core Ubuntu packages according to the list in
+# the file
+#
+#    core-packages.list
+#
+# For each line in that file, it checks if the package is installed before
+# attempting to install it.
+#
+
+# Versions:
+#  2013-07-06 @dalle   : First version
+
+# Get the packages from the list.
+packagesCore=$( awk '$1 ~ /^[a-z0-9]/ { print $1 }' core-packages.list )
+
+# Loop through them.
+for package in $packagesCore; do
+	# Echo it.
+	echo "Checking package: $package"
+	# Check the current status.
+	packageStatus=$( dpkg --get-selections | grep -P "^$package\t" | awk '{print $2}' )
+	# Process the status.
+	if [ "$packageStatus" == "install" ]; then
+		echo "Package currently installed."
+	elif [ "$packageStatus" == "deinstall" ]; then
+		echo "Package marked for deinstallation; attempting to (re)install."
+		apt-get install $package
+	else
+		echo "Installing."
+		apt-get install $package
+	fi
+done
+

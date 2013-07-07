@@ -1,0 +1,48 @@
+# !/bin/bash
+
+# Get the full path in reverse.
+rev_dir=$( pwd | rev )
+
+# Split these into an array.
+IFS="/"
+list_dir=( $rev_dir )
+IFS=""
+
+# List of permissible base directories
+base_dir=( 'Public' 'Shared' 'Private' )
+n_base=${#base_dir[@]}
+
+# Initialize important part of path.
+tail=""
+
+# Loop through the directories until one of them is in a base directory
+cont=true
+i=0
+while $cont ; do
+	# Get the current directory.
+	dir=$( echo ${list_dir[$i]} | rev )
+	
+	# Append this to the relevant part of path.
+	tail="$dir/$tail"
+
+	# Test if the directory matches one of the base ones
+	match=false
+	for (( j=0;j<$n_base;j++ )); do
+		if [ $dir == ${base_dir[$j]} ] ; then
+			cont=false
+		fi
+	done
+
+
+	# Increase the index.
+	let i++
+done
+
+# Base path to AFS
+afs="/afs/umich.edu/user/"${1:0:1}/${1:1:1}/$1
+
+# Full path to repository
+path="$afs/$tail"
+
+# Add the remote to git
+git remote add ${1} $path
