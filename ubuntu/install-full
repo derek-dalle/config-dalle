@@ -47,3 +47,5 @@ for f in $( ls bin/ ); do
 	cp -f bin/$f /usr/local/bin/
 done
 
+# Restart the OpenAFS kernel
+/etc/init.d/openafs-client restart
