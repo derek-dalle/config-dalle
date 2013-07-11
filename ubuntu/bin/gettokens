@@ -1,11 +1,20 @@
 #!/bin/bash
 
 
+# Get the user name
+if [ $# -lt 1 ]; then
+	# Default: the Unix username
+	user=$USER
+else
+	# username argument
+	user=$1
+fi
+
 # First get the Kerberos version 5 tokens
-kinit -5 -l 30d "$USER@UMICH.EDU"
+kinit -5 -l 30d "$user@UMICH.EDU"
 
 # Then get the AFS tokens
 aklog -cell umich.edu
 
 # Now change the current directory to match that one.
-cd /afs/umich.edu/user/${USER:0:1}/${USER:1:1}/$USER
+cd /afs/umich.edu/user/${user:0:1}/${user:1:1}/$user

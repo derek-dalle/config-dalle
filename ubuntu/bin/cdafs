@@ -8,7 +8,7 @@ if [ $# -lt 1 ]; then
 	# Default: the Unix username
 	user=$USER
 else
-	# username argument
+	# Use the argument.
 	user=$1
 fi
 

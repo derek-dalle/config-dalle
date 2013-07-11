@@ -32,10 +32,10 @@ for package in $packagesCore; do
 		echo "  Package currently installed."
 	elif [ "$packageStatus" == "deinstall" ]; then
 		echo "  Package marked for deinstallation; attempting to (re)install."
-		apt-get install $package
+		sudo apt-get install $package
 	else
 		echo "  Installing."
-		apt-get install $package
+		sudo apt-get install $package
 	fi
 done
 
@@ -52,31 +52,44 @@ for f in $( ls bin/ ); do
 			# Overwrite the script.
 			echo "  Warning: overwriting /usr/local/bin/$f"
 			# Copy the file.
-			cp -f bin/$f /usr/local/bin/
+			sudo cp -f bin/$f /usr/local/bin/
 		fi
 	else
 		# Notify.
 		echo "  Copying script to /usr/local/bin/"
 		# Copy the file.
-		cp -f bin/$f /usr/local/bin/
+		sudo cp -f bin/$f /usr/local/bin/
 	fi
 done
 
-# Store current directory.
-curdir=$( pwd )
-# Go to AFS folder
-. gettokens
+# Use this trick to get the real user's name (Not "root")
+user=${HOME:6}
+# Path to user's AFS path
+AFSHOME=/afs/umich.edu/user/${user:0:1}/${user:1:1}/$user
 # Check if AFS is working.
-touch this
+touch $AFSHOME/this
 # Perform the check.
-if [[ -f "this" ]]; then
+if [[ -f "$AFSHOME/this" ]]; then
 	# Status report
 	echo "AFS is working"
 	# Remove the test file.
-	rm this
+	rm $AFSHOME/this
+elif [[ -d "$AFSHOME" ]]; then
+	# Next attempt.
+	echo "  Could not write to AFS."
+	echo "  Attempting to get tokens."
+	# Try to get tokens.
+	gettokens $user
 else
+	# AFS directories not found.
+	echo "  AFS directories not found."
+	echo "  (Re)starting OpenAFS kernel."
 	# Restart the OpenAFS kernel
 	sudo /etc/init.d/openafs-client restart
+	# Attempt to get tokens
+	echo "  Attempting to get tokens."
+	# Attempt.
+	gettokens $user
 fi
 
 # Check if Dropbox is loaded.
@@ -87,6 +100,6 @@ else
 	# Alert.
 	echo "Starting Dropbox."
 	# Start Dropbox
-	/var/lib/dropbox/.dropbox-dist/dropboxd
+	sudo /var/lib/dropbox/.dropbox-dist/dropboxd
 fi
 
