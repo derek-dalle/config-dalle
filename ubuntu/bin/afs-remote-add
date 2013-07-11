@@ -1,4 +1,7 @@
 # !/bin/bash
+#
+# Function to add a git repository in a similarly named AFS folder.
+#
 
 # Get the full path in reverse.
 rev_dir=$( pwd | rev )

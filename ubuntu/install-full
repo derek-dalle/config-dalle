@@ -15,6 +15,7 @@
 #  2013-07-06 @dalle   : First version
 
 # Get the packages from the list.
+# Ignore comments and empty lines.
 packagesCore=$( awk '$1 ~ /^[a-z0-9]/ { print $1 }' packages.list )
 
 # Loop through them.
@@ -25,12 +26,12 @@ for package in $packagesCore; do
 	packageStatus=$( dpkg --get-selections | grep -P "^$package\t" | awk '{print $2}' )
 	# Process the status.
 	if [ "$packageStatus" == "install" ]; then
-		echo "Package currently installed."
+		echo "  Package currently installed."
 	elif [ "$packageStatus" == "deinstall" ]; then
-		echo "Package marked for deinstallation; attempting to (re)install."
+		echo "  Package marked for deinstallation; attempting to (re)install."
 		apt-get install $package
 	else
-		echo "Installing."
+		echo "  Installing."
 		apt-get install $package
 	fi
 done
@@ -38,12 +39,23 @@ done
 # Copy all of the files in the bin folder to /usr/local/bin
 for f in $( ls bin/ ); do
 	# Print label.
-	echo "Copying script '$f' to local directory"
+	echo "Checking  script: '$f'"
 	# Check if such a file already exists.
 	if [[ -f "/usr/local/bin/$f" ]]; then
-		echo "Warning: overwriting /usr/local/bin/$f"
+		# Get the difference between the two files.
+		d=$( diff bin/$f /usr/local/bin/$f )
+		# If it's not empty, overwrite.
+		if [ "$d" != "" ]; then
+			# Overwrite the script.
+			echo "  Warning: overwriting /usr/local/bin/$f"
+			# Copy the file.
+			cp -f bin/$f /usr/local/bin/
+		fi
+	else
+		# Notify.
+		echo "  Copying script to /usr/local/bin/"
+		# Copy the file.
+		cp -f bin/$f /usr/local/bin/
 	fi
-	# Copy the file.
-	cp -f bin/$f /usr/local/bin/
 done
 
