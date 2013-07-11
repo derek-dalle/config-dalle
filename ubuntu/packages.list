@@ -17,6 +17,10 @@ texlive-full
 vim
 xubuntu-desktop
 
+# To enable "module load matlab" and so forth
+environment-modules
+
+# AFS pacakges
 krb5-user
 krb5-config
 openafs-krb5
