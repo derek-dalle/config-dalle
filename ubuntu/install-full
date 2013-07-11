@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# sudo install-core
+# ./install-core
 #
 # This function installs the core Ubuntu packages according to the list in
 # the file
@@ -9,6 +9,9 @@
 #
 # For each line in that file, it checks if the package is installed before
 # attempting to install it.
+#
+# Do NOT run this script as root (sudo); lines requiring root priveleges will
+# automatically request them.
 #
 
 # Versions:
@@ -58,4 +61,32 @@ for f in $( ls bin/ ); do
 		cp -f bin/$f /usr/local/bin/
 	fi
 done
+
+# Store current directory.
+curdir=$( pwd )
+# Go to AFS folder
+. gettokens
+# Check if AFS is working.
+touch this
+# Perform the check.
+if [[ -f "this" ]]; then
+	# Status report
+	echo "AFS is working"
+	# Remove the test file.
+	rm this
+else
+	# Restart the OpenAFS kernel
+	sudo /etc/init.d/openafs-client restart
+fi
+
+# Check if Dropbox is loaded.
+if [[ -d "$HOME/Dropbox" ]]; then
+	# Say so.
+	echo "Dropbox already running."
+else
+	# Alert.
+	echo "Starting Dropbox."
+	# Start Dropbox
+	/var/lib/dropbox/.dropbox-dist/dropboxd
+fi
 
