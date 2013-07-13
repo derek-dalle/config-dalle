@@ -1,4 +1,4 @@
-# !/bin/bash
+#!/bin/bash
 #
 # Function to add a git repository in a similarly named AFS folder.
 #
