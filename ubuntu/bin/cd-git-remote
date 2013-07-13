@@ -1,0 +1,40 @@
+#!/bin/bash
+#
+# . cd-git-remote
+# . cd-git-remote HOME_TYPE
+#
+# This script changes director to the Git repository in another parent
+# folder corresponding to the current folder.  For example if a file is
+# located in
+#
+#    /home/dalle/config/ubuntu/bin/
+#
+# and
+#
+#    /home/dalle/config/.git
+#
+# is the home of the Git repository, then the options available are
+# shown below assuming the user's name is "dalle"
+#
+#    HOME_TYPE            Base directory
+#    (empty)              /afs/umich.edu/user/d/a/dalle/
+#    home                 /home/dalle/
+#    afs                  /afs/umich.edu/user/d/a/dalle/
+#    scratch              /scratch/kfid_flux/dalle/
+#    nobackup             /nobackup/dalle/
+#    dropbox              /home/dalle/Dropbox/
+#    uniqname (else)      /afs/umich.edu/user/u/n/uniqname
+#    
+#
+
+# Get the Git remote path, if any.
+target=$( git-remote-path "$@" )
+
+# Check for a find.
+if [ "$target" == "" ]; then
+	exit
+fi
+
+# Change directory.
+cd "$target"
+
