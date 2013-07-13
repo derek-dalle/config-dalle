@@ -1,0 +1,125 @@
+#!/bin/bash
+#
+# git-remote-path
+# git-remote-path HOME_TYPE
+#
+# This script prints the name of the Git repository in another parent
+# folder corresponding to the current folder.  For example if a file is
+# located in
+#
+#    /home/dalle/config/ubuntu/bin/
+#
+# and
+#
+#    /home/dalle/config/.git
+#
+# is the home of the Git repository, then the options available are
+# shown below assuming the user's name is "dalle"
+#
+#    HOME_TYPE            Base directory
+#    (empty)              /afs/umich.edu/user/d/a/dalle/
+#    home                 /home/dalle/
+#    afs                  /afs/umich.edu/user/d/a/dalle/
+#    scratch              /scratch/kfid_flux/dalle/
+#    nobackup             /nobackup/dalle/
+#    dropbox              /home/dalle/Dropbox/
+#    uniqname (else)      /afs/umich.edu/user/u/n/uniqname
+#    
+#
+
+# Get the user name
+# This method will work even if called from sudo or AFS.
+IFS="/"
+listdir=( $HOME )
+IFS=""
+# Extract the name of the last folder in $HOME
+user=${listdir[-1]}
+
+# Check the input.
+if [ $# -lt 1 ]; then
+	# Default: the name of the home folder (just the bottom dir)
+	home_type="afs"
+else
+	# AFS type
+	home_type=$1
+fi
+
+# Find the .git folder.
+githome=$( git-dir )
+
+# Check if none was found.
+if [ "$githome" == "" ]; then
+	exit
+fi
+
+# Save current directory (in case script is sourced).
+curdir=$( pwd )
+# Cut up Git parent directory.
+IFS="/"
+gitdirs=( $githome )
+IFS=""
+# Number of folders in path to Git.
+n_dirs=${#gitdirs[@]}
+
+# Determine the "root" of the current directory.
+if [ "${gitdirs[3]}" == "Dropbox" ]; then
+	# /home/user/Dropbox/
+	n_base=3
+elif [ "${gitdirs[1]}" == "home" ]; then
+	# /home/user/
+	n_base=2
+elif [ "${gitdirs[2]}" == "umich.edu" ]; then
+	# /afs/umich.edu/user/u/s/user/
+	n_base=6
+elif [ "${gitdirs[2]}" == "kfid_flux" ]; then
+	# /scratch/kfid_flux/user/
+	n_base=3
+elif [ "${gitdirs[1]}" == "nobackup" ]; then
+	# in the nobackup area
+	n_base=2
+else
+	# Unrecognized
+	exit
+fi
+
+# Initialize base path.
+base=""
+# Compile directories in the base of the path.
+for (( j=0;j<$n_base;j++ )); do
+	# Append.
+	base="$base/${gitdirs[j+1]}"
+done
+
+# Initialize tail path.
+tail=""
+# Compile directories in the base of the path.
+for (( j=$n_base;j<$n_dirs;j++ )); do
+	# Append.
+	tail="$tail/${gitdirs[j+1]}"
+done
+
+# Process the user input
+case "$home_type" in
+"Dropbox")
+	target="$HOME/Dropbox"
+	;;
+"home")
+	target="$HOME"
+	;;
+"scratch")
+	target="/scratch/kfid_flux/$user"
+	;;
+"nobackup")
+	target="/nobackup/$user"
+	;;
+"afs")
+	target="/afs/umich.edu/${user:0:1}/${user:1:1}/$user"
+	;;
+*)
+	user=$home_type
+	target="/afs/umich.edu/${user:0:1}/${user:1:1}/$user"
+	;;
+esac
+
+# Echo...
+echo $target$tail
