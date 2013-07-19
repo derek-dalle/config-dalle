@@ -103,3 +103,7 @@ else
 	sudo /var/lib/dropbox/.dropbox-dist/dropboxd
 fi
 
+
+
+# Copy the .bashrc file over IF it's newer.
+rsync --update bash/.bashrc $HOME/.bashrc
