@@ -39,6 +39,8 @@ for package in $packagesCore; do
 	fi
 done
 
+# Change folder to get at the universal files.
+cd ..
 # Copy all of the files in the bin folder to /usr/local/bin
 for f in $( ls bin/ ); do
 	# Print label.
@@ -106,4 +108,5 @@ fi
 
 
 # Copy the .bashrc file over IF it's newer.
+echo "Updating .bashrc if required."
 rsync --update bash/.bashrc $HOME/.bashrc
