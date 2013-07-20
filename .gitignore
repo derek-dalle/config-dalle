@@ -7,3 +7,10 @@
 *.gz
 *.tar
 *.bz
+*.swp
+
+jedit/.jedit/settings-backup/
+jedit/.jedit/server
+jedit/.jedit/history
+jedit/.jedit/activity.log
+

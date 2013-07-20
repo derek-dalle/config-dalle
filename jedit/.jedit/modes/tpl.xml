@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!--
+	Tpl mode by Brant Gurganus <brantgurganus2001@cherokeescouting.org>
+    Adapted from ColdFusion
+-->
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="commentStart" VALUE="&lt;!--" />
+		<PROPERTY NAME="commentEnd" VALUE="--&gt;" />
+	</PROPS>
+    <RULES IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
+		
+		<!-- TPL markup start tags -->
+		<SPAN TYPE="KEYWORD3" DELEGATE="TPL">
+			<BEGIN>{</BEGIN>
+			<END>}</END>
+		</SPAN>
+		<SPAN TYPE="COMMENT2" EXCLUDE_MATCH="FALSE">
+			<BEGIN>&lt;!--[</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+		<SPAN TYPE="COMMENT2" EXCLUDE_MATCH="FALSE">
+			<BEGIN>&lt;![</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+		<SPAN TYPE="COMMENT1" EXCLUDE_MATCH="FALSE">
+			<BEGIN>&lt;!--</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>		
+		<SPAN TYPE="MARKUP" DELEGATE="php::PHP">
+			<BEGIN>&lt;?php</BEGIN>
+			<END>?&gt;</END>
+		</SPAN>
+		<SPAN TYPE="MARKUP" DELEGATE="php::PHP">
+			<BEGIN>&lt;?=</BEGIN>
+			<END>?&gt;</END>
+		</SPAN>
+		<SPAN TYPE="MARKUP" DELEGATE="php::PHP">
+			<BEGIN>&lt;?</BEGIN>
+			<END>?&gt;</END>
+		</SPAN>
+		<SPAN_REGEXP HASH_CHAR="&lt;" TYPE="KEYWORD1" DELEGATE="html::OPEN_CSS_TAG_ATTRIBUTE_CONTENT">
+			<BEGIN>&lt;[\s]*style</BEGIN>
+			<END>&lt;/style&gt;</END>
+		</SPAN_REGEXP>
+		<SPAN_REGEXP HASH_CHAR="&lt;" TYPE="KEYWORD1" DELEGATE="html::OPEN_SCRIPT_TAG_ATTRIBUTE_CONTENT">
+			<BEGIN>&lt;[\s]*script</BEGIN>
+			<END>&lt;/script&gt;</END>
+		</SPAN_REGEXP>
+		<SPAN_REGEXP HASH_CHAR="&lt;" TYPE="MARKUP" DELEGATE="html::CLOSE_TAG_CONTENT">
+			<BEGIN>&lt;[\s]*/[\s]*</BEGIN>
+			<END>&gt;</END>
+		</SPAN_REGEXP>
+		<SPAN_REGEXP HASH_CHAR="&lt;" TYPE="MARKUP" DELEGATE="html::OPEN_TAG_CONTENT">
+			<BEGIN>&lt;[\s]*</BEGIN>
+			<END>&gt;</END>
+		</SPAN_REGEXP>
+	</RULES>
+    
+    <RULES SET="TPL" DEFAULT="KEYWORD1" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
+	
+		<SPAN TYPE="LABEL">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<SPAN TYPE="LABEL">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+		
+		<SEQ TYPE="OPERATOR">*</SEQ>
+
+		
+		<KEYWORDS>
+			<KEYWORD1>include</KEYWORD1>
+            <OPERATOR>=</OPERATOR>
+            <KEYWORD2>START</KEYWORD2>
+            <KEYWORD2>END</KEYWORD2>
+		</KEYWORDS>
+	</RULES>
+    
+    <RULES SET="TAGS" DEFAULT="MARKUP" IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
+		<SPAN TYPE="LITERAL1">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+		<SPAN TYPE="LITERAL1">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<SEQ TYPE="OPERATOR">=</SEQ>
+
+	</RULES>
+</MODE>
