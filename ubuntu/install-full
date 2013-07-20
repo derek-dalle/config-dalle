@@ -114,7 +114,7 @@ rsync --update bash/.bashrc $HOME/.bashrc
 # Copy the .vimrc file if it's newer.
 echo "Updating .vimrc if required."
 rsync --update vim/.vimrc $HOME/.vimrc
-rsync --update $HOME.vimrc vim/.vimrc
+rsync --update $HOME/.vimrc vim/.vimrc
 
 # Update the keyboards (both ways).
 for f in $( ls keyboards )
