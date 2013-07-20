@@ -110,3 +110,16 @@ fi
 # Copy the .bashrc file over IF it's newer.
 echo "Updating .bashrc if required."
 rsync --update bash/.bashrc $HOME/.bashrc
+
+# Copy the .vimrc file if it's newer.
+echo "Updating .vimrc if required."
+rsync --update vim/.vimrc $HOME/.vimrc
+rsync --update $HOME.vimrc vim/.vimrc
+
+# Update the keyboards (both ways).
+for f in $( ls keyboards )
+do
+	sudo rsync --update keyboards/$f /usr/share/X11/xkb/symbols/
+	sudo rsync --update /usr/share/X11/xkb/symbols/$f keyboards/
+done
+
