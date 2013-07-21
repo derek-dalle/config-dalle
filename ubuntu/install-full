@@ -119,7 +119,17 @@ rsync --update $HOME/.vimrc vim/.vimrc
 # Update the keyboards (both ways).
 for f in $( ls keyboards )
 do
-	sudo rsync --update keyboards/$f /usr/share/X11/xkb/symbols/
-	sudo rsync --update /usr/share/X11/xkb/symbols/$f keyboards/
+	# Print a label.
+	echo "Checking keyboard '$f'"
+	# Calculate the a differences.
+	d=$( diff keyboards/$f /usr/share/X11/xkb/symbols/$f )
+	# Check if differences are present.
+	if [[ "$d" != "" ]]; then
+		# Say that a difference is present.
+		echo "  Files differ; synchronizing to most recent."
+		# Synchronize the files.
+		sudo rsync --update keyboards/$f /usr/share/X11/xkb/symbols/
+		sudo rsync --update /usr/share/X11/xkb/symbols/$f keyboards/
+	fi
 done
 

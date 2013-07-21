@@ -30,7 +30,7 @@ set nostartofline
 " Display cursor position!
 set ruler
 " On a related note, did not know vim can show line numbers
-set number
+" set number
 
 " Keep using tabs, but only two spaces.
 set tabstop=2
