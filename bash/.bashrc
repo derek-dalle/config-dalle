@@ -24,11 +24,12 @@ else
 fi
 
 # Module path
-if [ -z $MODULEPATH ]; then
-	MODULEPATH="$HOME/Modules"
-else
-	MODULEPATH="$HOME/Modules:$MODULEPATH"
+if [[ "$MODULEPATH" == "" ]]; then
+	# Source the stupid package that never works.
+	. /usr/share/modules/init/bash
 fi
+# Now add the useful part of the path.
+MODULEPATH="$HOME/Modules:$MODULEPATH"
 
 # If not running interactively, don't do anything.
 [ -z "$PS1" ] && return

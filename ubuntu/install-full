@@ -110,6 +110,7 @@ fi
 # Copy the .bashrc file over IF it's newer.
 echo "Updating .bashrc if required."
 rsync --update bash/.bashrc $HOME/.bashrc
+rsync --update $HOME/.bashrc bash/.bashrc
 
 # Copy the .vimrc file if it's newer.
 echo "Updating .vimrc if required."
