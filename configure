@@ -278,16 +278,19 @@ update_both() {
 	# Check if repository version is newer.
 	if [ "$2" -nt "$3" ]; then
 		# Update or initialize installed version.
-		echo "  Synchronizing $1: Repository version is newer."
+		echo "  Synchronizing '$1': Repository version is newer."
 		rsync --update "$2" "$3"
 	elif [ "$3" -nt "$2" ]; then
 		# Update the repository version.
-		echo "  Synchronizing $1: Local (installed) version is newer."
+		echo "  Synchronizing '$1': Local (installed) version is newer."
 		rsync --update "$3" "$2"
-	else
+	elif [ ! -f "$2" ]; then
 		# File does not exist.
-		echo "  Syncrhonizing $1: '$2' does not exist."
+		echo "  Syncrhonizing '$1': '$2' does not exist."
 		exit 1
+	else
+		# Same age?
+		echo "  Synchronizing '$1': equivalent."
 	fi
 }
 
@@ -299,6 +302,17 @@ if [ "$q_settings" == "true" ]; then
 	# Do two-way updates on some dotfiles.
 	update_both ".bashrc" "bash/.bashrc" "$HOME/.bashrc"
 	update_both ".vimrc" "vim/.vimrc" "$HOME/.vimrc"
+	update_both ".jedit/properties" "jedit/.jedit/properties" \
+	"$HOME/.jedit/properties"
+	update_both "jEdit keymaps" "jedit/.jedit/keymaps/imported_keys.props" \
+	"$HOME/.jedit/keymaps/imported_keys.props"
 	
+	# Synchronize .jedit folders (selectively).
+	echo "  Synchronizing jEdit plugins."
+	rsync -ru jedit/.jedit/jars/ $HOME/.jedit/jars/
+	rsync -ru $HOME/.jedit/jars/ jedit/.jedit/jars/
+	echo "  Synchronizing jEdit custom syntax highlighting."
+	rsync -ru jedit/.jedit/modes/ $HOME/.jedit/modes/
+	rsync -ru $HOME/.jedit/modes/ jedit/.jedit/modes/
 	echo " "
 fi

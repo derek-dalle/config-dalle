@@ -1,0 +1,226 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<MODE>
+	<PROPS>
+		<PROPERTY NAME="commentStart" VALUE="&lt;!--" />
+		<PROPERTY NAME="commentEnd" VALUE="--&gt;" />
+	</PROPS>
+	<RULES IGNORE_CASE="TRUE">
+		<!-- SSI -->
+		<!-- SSI directives should ALWAYS end like this, with a space
+			before the tag end, so let's make it colorize poorly otherwise -->
+		<!-- ... or really? see bug report 964860 -->
+		<SPAN TYPE="KEYWORD3" DELEGATE="SSI">
+			<BEGIN>&lt;!--#</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<!-- SGML comment -->
+		<SPAN TYPE="COMMENT1">
+			<BEGIN>&lt;!--</BEGIN>
+			<END>--&gt;</END>
+		</SPAN>
+
+		<!-- JavaScript -->
+		<SPAN TYPE="MARKUP" DELEGATE="html::JAVASCRIPT">
+			<BEGIN>&lt;SCRIPT</BEGIN>
+			<END>&lt;/SCRIPT&gt;</END>
+		</SPAN>
+
+		<!-- stylesheet -->
+		<SPAN TYPE="MARKUP" DELEGATE="html::CSS">
+			<BEGIN>&lt;STYLE</BEGIN>
+			<END>&lt;/STYLE&gt;</END>
+		</SPAN>
+
+		<!-- DTD instructions -->
+		<SPAN TYPE="KEYWORD2" DELEGATE="xml::DTD-TAGS">
+			<BEGIN>&lt;!</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- markup tags -->
+		<SPAN TYPE="MARKUP" DELEGATE="TAGS">
+			<BEGIN>&lt;</BEGIN>
+			<END>&gt;</END>
+		</SPAN>
+
+		<!-- SGML entities -->
+		<SPAN TYPE="LITERAL2" NO_WORD_BREAK="TRUE">
+			<BEGIN>&amp;</BEGIN>
+			<END>;</END>
+		</SPAN>
+	</RULES>
+
+	<RULES SET="TAGS" DEFAULT="MARKUP">
+		<SPAN TYPE="LITERAL1">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<SPAN TYPE="LITERAL1">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+
+		<SEQ TYPE="OPERATOR">=</SEQ>
+	</RULES>
+
+	<RULES SET="SSI" DEFAULT="KEYWORD3">
+		<SPAN TYPE="LITERAL1" MATCH_TYPE="OPERATOR" DELEGATE="SSI-EXPRESSION">
+			<BEGIN>"</BEGIN>
+			<END>"</END>
+		</SPAN>
+
+		<!-- MD: i don't think this is valid
+		<SPAN TYPE="LITERAL1" MATCH_TYPE="OPERATOR" DELEGATE="SSI-EXPRESSION">
+			<BEGIN>'</BEGIN>
+			<END>'</END>
+		</SPAN>
+		-->
+
+		<SEQ TYPE="OPERATOR">=</SEQ>
+
+		<KEYWORDS>
+			<KEYWORD1>config</KEYWORD1>
+			<KEYWORD1>echo</KEYWORD1>
+			<KEYWORD1>exec</KEYWORD1>
+			<KEYWORD1>flastmod</KEYWORD1>
+			<KEYWORD1>fsize</KEYWORD1>
+			<KEYWORD1>include</KEYWORD1>
+
+			<KEYWORD2>cgi</KEYWORD2>
+			<KEYWORD2>errmsg</KEYWORD2>
+			<KEYWORD2>file</KEYWORD2>
+			<KEYWORD2>sizefmt</KEYWORD2>
+			<KEYWORD2>timefmt</KEYWORD2>
+			<KEYWORD2>var</KEYWORD2>
+			<KEYWORD2>cmd</KEYWORD2>
+		</KEYWORDS>
+	</RULES>
+
+	<RULES SET="SSI-EXPRESSION" DEFAULT="LITERAL1" ESCAPE="\">
+
+		<MARK_FOLLOWING TYPE="KEYWORD2">$</MARK_FOLLOWING>
+
+		<SEQ TYPE="OPERATOR">=</SEQ>
+		<SEQ TYPE="OPERATOR">!=</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;</SEQ>
+		<SEQ TYPE="OPERATOR">&lt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;</SEQ>
+		<SEQ TYPE="OPERATOR">&gt;=</SEQ>
+		<SEQ TYPE="OPERATOR">&amp;&amp;</SEQ>
+		<SEQ TYPE="OPERATOR">||</SEQ>
+	</RULES>
+	
+	<!-- LIST OF ALL OPEN TAGS -->
+	<RULES SET="TAGS" DEFAULT="MARKUP">
+	<KEYWORDS>
+			<!-- structure tags -->
+			<KEYWORD1>body</KEYWORD1>
+			<KEYWORD1>div</KEYWORD1>
+			<KEYWORD1>frameset</KEYWORD1>
+			<KEYWORD1>frame</KEYWORD1>
+			<KEYWORD1>head</KEYWORD1>
+			<KEYWORD1>html</KEYWORD1>
+			
+			<!-- top-level tags -->
+			<KEYWORD2>address</KEYWORD2>
+			<KEYWORD2>base</KEYWORD2>
+			<KEYWORD2>bdo</KEYWORD2>
+			<KEYWORD2>blockquote</KEYWORD2>
+			<KEYWORD2>form</KEYWORD2>
+			<KEYWORD2>h1</KEYWORD2>
+			<KEYWORD2>h2</KEYWORD2>
+			<KEYWORD2>h3</KEYWORD2>
+			<KEYWORD2>h4</KEYWORD2>
+			<KEYWORD2>h5</KEYWORD2>
+			<KEYWORD2>h6</KEYWORD2>
+			<KEYWORD2>link</KEYWORD2>
+			<KEYWORD2>meta</KEYWORD2>
+			<KEYWORD2>noscript</KEYWORD2>
+			<KEYWORD2>ol</KEYWORD2>
+			<KEYWORD2>p</KEYWORD2>
+			<KEYWORD2>table</KEYWORD2>
+			<KEYWORD2>title</KEYWORD2>
+			<KEYWORD2>ul</KEYWORD2>
+			
+			<!-- secondary tags -->
+			<KEYWORD3>a</KEYWORD3>
+			<KEYWORD3>acronym</KEYWORD3>
+			<KEYWORD3>abbr</KEYWORD3>
+			<KEYWORD3>button</KEYWORD3>
+			<KEYWORD3>cite</KEYWORD3>
+			<KEYWORD3>b</KEYWORD3>
+			<KEYWORD3>big</KEYWORD3>
+			<KEYWORD3>code</KEYWORD3>
+			<KEYWORD3>del</KEYWORD3>
+			<KEYWORD3>dfn</KEYWORD3>
+			<KEYWORD3>em</KEYWORD3>
+			<KEYWORD3>embed</KEYWORD3>
+			<KEYWORD3>i</KEYWORD3>
+			<KEYWORD3>iframe</KEYWORD3>
+			<KEYWORD3>img</KEYWORD3>
+			<KEYWORD3>input</KEYWORD3>
+			<KEYWORD3>ins</KEYWORD3>
+			<KEYWORD3>kbd</KEYWORD3>
+			<KEYWORD3>map</KEYWORD3>
+			<KEYWORD3>object</KEYWORD3>
+			<KEYWORD3>pre</KEYWORD3>
+			<KEYWORD3>q</KEYWORD3>
+			<KEYWORD3>samp</KEYWORD3>
+			<KEYWORD3>select</KEYWORD3>
+			<KEYWORD3>small</KEYWORD3>
+			<KEYWORD3>span</KEYWORD3>
+			<KEYWORD3>strong</KEYWORD3>
+			<KEYWORD3>tbody</KEYWORD3>
+			<KEYWORD3>textarea</KEYWORD3>
+			<KEYWORD3>tfoot</KEYWORD3>
+			<KEYWORD3>thead</KEYWORD3>
+			<KEYWORD3>tr</KEYWORD3>
+			<KEYWORD3>tt</KEYWORD3>
+			<KEYWORD3>var</KEYWORD3>
+			
+			<!-- ternary tags -->
+			<KEYWORD3>area</KEYWORD3>
+			<KEYWORD3>caption</KEYWORD3>
+			<KEYWORD3>dd</KEYWORD3>
+			<KEYWORD3>dt</KEYWORD3>
+			<KEYWORD3>fieldset</KEYWORD3>
+			<KEYWORD3>label</KEYWORD3>
+			<KEYWORD3>legend</KEYWORD3>
+			<KEYWORD3>li</KEYWORD3>
+			<KEYWORD3>optgroup</KEYWORD3>
+			<KEYWORD3>option</KEYWORD3>
+			<KEYWORD3>sub</KEYWORD3>
+			<KEYWORD3>sup</KEYWORD3>
+			<KEYWORD3>td</KEYWORD3>
+			<KEYWORD3>th</KEYWORD3>
+			
+			
+			<!-- singleton tags -->
+			<KEYWORD3>br</KEYWORD3>
+			<KEYWORD3>hr</KEYWORD3>
+			<KEYWORD3>param</KEYWORD3>
+
+			<!-- deprecated -->
+			<COMMENT4>applet</COMMENT4>
+			<COMMENT4>basefont</COMMENT4>
+			<COMMENT4>center</COMMENT4>
+			<COMMENT4>dir</COMMENT4>
+			<COMMENT4>font</COMMENT4>
+			<COMMENT4>isindex</COMMENT4>
+			<COMMENT4>menu</COMMENT4>
+			<COMMENT4>s</COMMENT4>
+			<COMMENT4>strike</COMMENT4>
+			<COMMENT4>u</COMMENT4>
+
+			<!-- {{{ Microsoft proprietary -->
+			<COMMENT4>ilayer</COMMENT4>
+			<COMMENT4>nobr</COMMENT4>
+			<!-- }}} -->
+		</KEYWORDS>
+	</RULES>
+</MODE>
