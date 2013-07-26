@@ -302,11 +302,23 @@ if [ "$q_settings" == "true" ]; then
 	# Do two-way updates on some dotfiles.
 	update_both ".bashrc" "bash/.bashrc" "$HOME/.bashrc"
 	update_both ".vimrc" "vim/.vimrc" "$HOME/.vimrc"
+	
+	# Matlab settings.
+	echo "  Synchronizing MATLAB settings."
+	# Make the folders if necessary.
+	mkdir -p "$HOME/Documents"
+	mkdir -p "$HOME/Documents/MATLAB"
+	# Update files but don't copy new ones from local.
+	for f in $( ls "MATLAB" ); do
+		update_both "$f" "MATLAB/$f" "$HOME/Documents/MATLAB/$f"
+	done
+	
+	
+	# jEdit settings
 	update_both ".jedit/properties" "jedit/.jedit/properties" \
 	"$HOME/.jedit/properties"
 	update_both "jEdit keymaps" "jedit/.jedit/keymaps/imported_keys.props" \
 	"$HOME/.jedit/keymaps/imported_keys.props"
-	
 	# Synchronize .jedit folders (selectively).
 	echo "  Synchronizing jEdit plugins."
 	rsync -ru jedit/.jedit/jars/ $HOME/.jedit/jars/
@@ -315,4 +327,5 @@ if [ "$q_settings" == "true" ]; then
 	rsync -ru jedit/.jedit/modes/ $HOME/.jedit/modes/
 	rsync -ru $HOME/.jedit/modes/ jedit/.jedit/modes/
 	echo " "
+	
 fi
