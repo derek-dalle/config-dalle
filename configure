@@ -1,0 +1,304 @@
+#!/bin/bash
+#
+# ./configure [OPTIONS]
+#
+# This function stores as many of my settings as I can script up.
+#
+# Do NOT run this script as root (sudo); commands requiring root privileges will
+# automatically request them.
+#
+
+# Versions:
+#  2013-07-06 @dalle   : First version
+#  2013-07-26 @dalle   : Improved to take optional inputs.
+
+# Default settings
+q_packages="false"
+q_skeleton="true"
+q_dropbox="false"
+q_afs="false"
+q_root="false"
+q_local="true"
+q_settings="true"
+q_scripts="true"
+q_keyboards="false"
+
+# System settings
+user=$USER
+
+# Non-Boolean settings
+# List of packages
+f_packages="ubuntu/packages.list"
+# Folder containing scripts
+d_scripts="bin"
+
+# Name of script used in this call
+scriptname="$0"
+
+# Functions
+# Function info
+usage() {
+	echo " Global configuration script."
+	echo "  "
+	echo " USAGE: $0 [options]"
+	echo "  "
+	echo " Available options:"
+	echo "   -afs                  Check AFS installation."
+	echo "   -dropbox              Check Dropbox installation."
+	echo "   -keyboards            Synchronize keyboard files."
+	echo "   -packages             Install missing packages."
+	echo "   -package_list f       Use file \$f for list of packages."
+	echo "   -root                 Enable root privileges."
+	echo "   -scripts              Synchronize scripts."
+	echo "   -settings             Synchronize settings and dotfiles."
+	echo " "
+}
+
+# Display an unknown option.
+unknown_option() {
+	echo "  Unknown input option '$1'"
+	echo "  See $scriptname -help for valid options."
+}
+
+# Display the header.
+echo " "
+echo "* Global configuration script *"
+echo "Invoked with: "
+echo " "
+echo "  $scriptname $@"
+echo " "
+
+# If no options were called, remind user how to display them.
+if [[ "$#" == 0 ]]; then
+	echo " Running without options."
+	echo " To show available options, run with $scriptname -help"
+	echo " "
+fi
+
+# Process options
+while [[ $1 ]]; do
+	# Check the option.
+	case $1 in
+	-help | -h)
+		# Display usage information.
+		usage
+		;;
+	-afs)
+		q_afs="true"
+		;;
+	-dropbox)
+		q_dropbox="true"
+		;;
+	-keyboards | -keyboard)
+		q_keyboards="true"
+		;;
+	-packages)
+		q_packages="true"
+		;;
+	-root)
+		q_root="true"
+		;;
+	-scripts)
+		q_scripts="true"
+		;;
+	-settings | -dotfiles )
+		q_settings="true"
+		;;
+	-package_list)
+		# Using non-default package list file.
+		q_packages="true"
+		shift
+		f_packages="$1"
+		;;
+	*)
+		unknown_option $1
+		;;
+	esac
+	# Shift the arguments.
+	shift
+done
+
+# Inform user of options.
+echo "Settings:"
+echo "              Root privileges: $q_root"
+echo "             Install packages: $q_packages"
+echo "      Check and configure AFS: $q_afs"
+echo "  Check and configure Dropbox: $q_dropbox"
+echo "          Synchronize scripts: $q_scripts"
+echo "         Synchronize settings: $q_settings"
+echo "        Synchronize keyboards: $q_keyboards"
+echo " "
+
+
+# Package installation block
+if [[ "$q_root" == "true" && "$q_packages" == "true" ]]; then
+	# Say what step is being taken.
+	echo "Checking for and installing missing packages."
+	echo "Reading package list from '$f_packages'."
+	echo " "
+	# Check if package list file exists.
+	if [ ! -f "$f_packages" ]; then
+		echo "Package list file not found."
+		exit 1
+	fi
+	# Read the packages.
+	s_packages=$( awk '$1 ~ /^[a-z0-9]/ { print $1 }' $f_packages )
+	# Loop through them.
+	for package in $s_packages; do
+		# Echo it.
+		echo "Checking package: $package"
+		# Check the current status.
+		packageStatus=$(\
+			dpkg --get-selections | grep -P "^$package\t" | awk '{print $2}' )
+		# Process the status.
+		if [ "$packageStatus" == "install" ]; then
+			echo "  Package currently installed."
+		elif [ "$packageStatus" == "deinstall" ]; then
+			echo "  Package marked for deinstallation; attempting to (re)install."
+			sudo apt-get install $package
+		else
+			echo "  Installing."
+			sudo apt-get install $package
+		fi
+	done
+elif [[ "q_packages" == "true" ]]; then
+	# Impossible!
+	echo "Requested to install packages, but no root privileges."
+	echo "Skipping."
+	echo " "
+fi
+
+# Check if scripts should be synchronized.
+if [[ "$q_scripts" == "true" ]]; then
+	# Output
+	echo "Synchronizing scripts in local/bin/ directory."
+	echo "Using contents of '$d_scripts'."
+	echo " "
+	# Make sure the directory exists.
+	mkdir -p "$HOME/usr"
+	mkdir -p "$HOME/usr/local"
+	mkdir -p "$HOME/usr/local/bin"
+	# Check all of the scripts.
+	for f in $( ls "$d_scripts" ); do
+		# Check if it's executable.
+		if [ ! -x "$d_scripts/$f" ]; then
+			continue
+		fi
+		# Verbose status update
+		echo "  Checking script: $f"
+		# Check if it already exists and if it's newer.
+		if [ ! -f "$HOME/usr/local/bin/$f" ]; then
+			# Script is not in folder
+			echo "    New script; copying to $HOME/usr/local/bin/"
+			cp $d_scripts/$f "$HOME/usr/local/bin/"
+		elif [ "$d_scripts/$f" -nt "$HOME/usr/local/bin/$f" ]; then
+			# Local script is newer.
+			echo "    Configuration repository script is newer, updating."
+			cp $d_scripts/$f "$HOME/usr/local/bin/$f" -f
+		fi
+	done
+	echo " "
+fi
+
+
+
+
+
+# AFS settings
+if [ "$q_afs" == "true" ]; then
+	# Flag.
+	echo "Checking AFS status."
+	# Check if AFS and Kerberos commands are present.
+	if [[ $(which kinit) && $(which aklog) ]]; then
+		# Path to user's AFS path
+		AFSHOME=/afs/umich.edu/user/${user:0:1}/${user:1:1}/$user
+		# Check if there is such a folder.
+		if [ ! -d "$AFSHOME" ]; then
+			echo "  AFS home folder '$AFSHOME' not found."
+			# No AFS folders; see if we can do anything about it.
+			if [ "$q_root" == "true" ]; then
+				# Restart the OpenAFS kernel.
+				echo "  (Re)starting OpenAFS kernel."
+				sudo /etc/init.d/openafs-client restart
+			else
+				# Nothing to do.
+				echo "  No root privileges; cannot restart AFS."
+			fi
+		fi
+		# Try to create a file in the AFS folder.
+		touch "$AFSHOME/this"
+		# Perform the check.
+		if [[ -f "$AFSHOME/this" ]]; then
+			# Status report
+			echo "  AFS is working."
+			# Remove the test file.
+			rm $AFSHOME/this
+		else
+			# Next attempt.
+			echo "  Could not write to AFS."
+			echo "  Attempting to get tokens."
+			# Try to get tokens.
+			kinit -l 30d $user@UMICH.EDU
+			aklog
+		fi
+	else
+		# Nothing to do.
+		echo "  AFS commands ('kinit' and 'aklog') not found."
+	fi
+	echo " "
+fi
+
+# Dropbox settings
+if [ "$q_dropbox" == "true" ]; then
+	# Output.
+	echo "Checking Dropbox status."
+	# Check if Dropbox is loaded.
+	if [[ -d "$HOME/Dropbox" ]]; then
+		# Say so.
+		echo "  Dropbox is running."
+	elif [ "q_root" == "true" ]; then
+		# Alert.
+		echo "  Starting Dropbox."
+		# Start Dropbox
+		sudo /var/lib/dropbox/.dropbox-dist/dropboxd
+	else
+		# Alert; nothing to do.
+		echo "  Dropbox not running, but no root privileges."
+	fi
+	echo " "
+fi
+
+
+
+# Convenient function to take newer version of file.
+update_both() {
+	# First argument: label for synchronizing.
+	# Second argument: repository version.
+	# Third argument: path to "installed" version if it were to exist.
+	# Check if repository version is newer.
+	if [ "$2" -nt "$3" ]; then
+		# Update or initialize installed version.
+		echo "  Synchronizing $1: Repository version is newer."
+		rsync --update "$2" "$3"
+	elif [ "$3" -nt "$2" ]; then
+		# Update the repository version.
+		echo "  Synchronizing $1: Local (installed) version is newer."
+		rsync --update "$3" "$2"
+	else
+		# File does not exist.
+		echo "  Syncrhonizing $1: '$2' does not exist."
+		exit 1
+	fi
+}
+
+
+# Settings.
+if [ "$q_settings" == "true" ]; then
+	echo "Updating settings and dotfiles."
+	
+	# Do two-way updates on some dotfiles.
+	update_both ".bashrc" "bash/.bashrc" "$HOME/.bashrc"
+	update_both ".vimrc" "vim/.vimrc" "$HOME/.vimrc"
+	
+	echo " "
+fi
