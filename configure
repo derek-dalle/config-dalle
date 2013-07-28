@@ -23,6 +23,10 @@ q_settings="false"
 q_scripts="false"
 q_keyboards="false"
 
+# Specific programs
+q_jedit="false"
+q_matlab="false"
+
 # System settings
 user=$USER
 
@@ -51,6 +55,16 @@ usage() {
 	echo "   -root                 Enable root privileges."
 	echo "   -scripts              Synchronize scripts."
 	echo "   -settings             Synchronize settings and dotfiles."
+	echo " "
+	echo " Options to configure specific programs:"
+	echo "   -matlab               Synchronize '~/Documents/MATLAB'."
+	echo "   -jedit                Configure jEdit."
+	echo " "
+	echo " In addition, there are several shortcuts that set several"
+	echo " settings (that is, they are cascading options)."
+	echo "   -install   : -root -packages -afs -dropbox -keyboards"
+	echo "   -update    : -scripts -settings -matlab -jedit -keyboards"
+	echo "   -all       : (sets all to true)"
 	echo " "
 }
 
@@ -104,6 +118,40 @@ while [[ $1 ]]; do
 	-settings | -dotfiles )
 		q_settings="true"
 		;;
+	-jedit)
+		q_jedit="true"
+		;;
+	-matlab)
+		q_matlab="true"
+		;;
+	-all)
+		# This flag is used to turn all settings on.
+		q_root="true"
+		q_packages="true"
+		q_afs="true"
+		q_dropbox="true"
+		q_keyboards="true"
+		q_scripts="true"
+		q_settings="true"
+		q_jedit="true"
+		q_matlab="true"
+		;;
+	-install)
+		# This is a cascading option for installation-like settings.
+		q_root="true"
+		q_packages="true"
+		q_afs="true"
+		q_dropbox="true"
+		q_keyboards="true"
+		;;
+	-update)
+		# This is a cascading option for all settings.
+		q_keyboards="true"
+		q_scripts="true"
+		q_settings="true"
+		q_jedit="true"
+		q_matlab="true"
+		;;
 	-package_list)
 		# Using non-default package list file.
 		q_packages="true"
@@ -127,8 +175,81 @@ echo "  Check and configure Dropbox: $q_dropbox"
 echo "          Synchronize scripts: $q_scripts"
 echo "         Synchronize settings: $q_settings"
 echo "        Synchronize keyboards: $q_keyboards"
+echo "Specific programs:"
+echo "                        jEdit: $q_jedit"
+echo "                       MATLAB: $q_matlab"
 echo " "
 
+
+
+
+# Convenient function to take newer version of file.
+update_both() {
+	# First argument: label for synchronizing.
+	# Second argument: repository version.
+	# Third argument: path to "installed" version if it were to exist.
+	# Check if repository version is newer.
+	if [[ -f "$2" && -f "$3" ]]; then
+		# Both files exist; get the differences.
+		d=$( diff "$2" "$3" )
+		# Check for differences
+		if [ "$d" == "" ]; then
+			# No differences.
+			echo "  Synchronizing '$1': equivalent."
+		elif [ "$2" -nt "$3" ]; then
+			# Update or initialize installed version.
+			echo "  Synchronizing '$1': Repository version is newer."
+			rsync --update "$2" "$3"
+		elif [ "$3" -nt "$2" ]; then
+			# Update the repository version.
+			echo "  Synchronizing '$1': Local (installed) version is newer."
+			rsync --update "$3" "$2"
+		fi
+	elif [ ! -f "$2" ]; then
+		# File does not exist.
+		echo "  Syncrhonizing '$1': '$2' does not exist."
+		exit 1
+	else
+		# Same age?
+		echo "  Synchronizing '$1': Copying repository version."
+		cp "$2" "$3"
+	fi
+}
+
+
+
+# Convenient function to take newer version of file.
+sudo_update_both() {
+	# First argument: label for synchronizing.
+	# Second argument: repository version.
+	# Third argument: path to "installed" version if it were to exist.
+	# Check if repository version is newer.
+	if [[ -f "$2" && -f "$3" ]]; then
+		# Both files exist; get the differences.
+		d=$( diff "$2" "$3" )
+		# Check for differences
+		if [ "$d" == "" ]; then
+			# No differences.
+			echo "  Synchronizing '$1': equivalent."
+		elif [ "$2" -nt "$3" ]; then
+			# Update or initialize installed version.
+			echo "  Synchronizing '$1': Repository version is newer."
+			sudo rsync --update "$2" "$3"
+		elif [ "$3" -nt "$2" ]; then
+			# Update the repository version.
+			echo "  Synchronizing '$1': Local (installed) version is newer."
+			sudo rsync --update "$3" "$2"
+		fi
+	elif [ ! -f "$2" ]; then
+		# File does not exist.
+		echo "  Syncrhonizing '$1': '$2' does not exist."
+		exit 1
+	else
+		# Same age?
+		echo "  Synchronizing '$1': Copying repository version."
+		sudo cp "$2" "$3"
+	fi
+}
 
 # Package installation block
 if [[ "$q_root" == "true" && "$q_packages" == "true" ]]; then
@@ -172,8 +293,7 @@ fi
 if [[ "$q_scripts" == "true" ]]; then
 	# Output
 	echo "Synchronizing scripts in local/bin/ directory."
-	echo "Using contents of '$d_scripts'."
-	echo " "
+	echo "Using contents of directory '$d_scripts/'."
 	# Make sure the directory exists.
 	mkdir -p "$HOME/usr"
 	mkdir -p "$HOME/usr/local"
@@ -182,26 +302,14 @@ if [[ "$q_scripts" == "true" ]]; then
 	for f in $( ls "$d_scripts" ); do
 		# Check if it's executable.
 		if [ ! -x "$d_scripts/$f" ]; then
+			echo "  Not synchronizing $f; not executable."
 			continue
 		fi
-		# Verbose status update
-		echo "  Checking script: $f"
-		# Check if it already exists and if it's newer.
-		if [ ! -f "$HOME/usr/local/bin/$f" ]; then
-			# Script is not in folder
-			echo "    New script; copying to $HOME/usr/local/bin/"
-			cp $d_scripts/$f "$HOME/usr/local/bin/"
-		elif [ "$d_scripts/$f" -nt "$HOME/usr/local/bin/$f" ]; then
-			# Local script is newer.
-			echo "    Configuration repository script is newer, updating."
-			cp $d_scripts/$f "$HOME/usr/local/bin/$f" -f
-		fi
+		# Update.
+		update_both "$f" "$d_scripts/$f" "$HOME/usr/local/bin/$f"
 	done
 	echo " "
 fi
-
-
-
 
 
 # AFS settings
@@ -270,30 +378,6 @@ fi
 
 
 
-# Convenient function to take newer version of file.
-update_both() {
-	# First argument: label for synchronizing.
-	# Second argument: repository version.
-	# Third argument: path to "installed" version if it were to exist.
-	# Check if repository version is newer.
-	if [ "$2" -nt "$3" ]; then
-		# Update or initialize installed version.
-		echo "  Synchronizing '$1': Repository version is newer."
-		rsync --update "$2" "$3"
-	elif [ "$3" -nt "$2" ]; then
-		# Update the repository version.
-		echo "  Synchronizing '$1': Local (installed) version is newer."
-		rsync --update "$3" "$2"
-	elif [ ! -f "$2" ]; then
-		# File does not exist.
-		echo "  Syncrhonizing '$1': '$2' does not exist."
-		exit 1
-	else
-		# Same age?
-		echo "  Synchronizing '$1': equivalent."
-	fi
-}
-
 
 # Settings.
 if [ "$q_settings" == "true" ]; then
@@ -329,7 +413,7 @@ fi
 	
 
 # jEdit settings
-if [ "$q_jedit" == "true" && -d "$HOME/.jedit" ]; then
+if [ "$q_jedit" == "true" ]; then
 	echo "Synchronizing jEdit settings."
 	# Make the directories if necessary.
 	mkdir -p "$HOME/.jedit"
@@ -352,13 +436,13 @@ if [ "$q_jedit" == "true" && -d "$HOME/.jedit" ]; then
 fi
 
 # Keyboards!
-if [ "$q_root" == "true" && "$q_keyboards" == "true"]; then
+if [[ "$q_root" == "true" && "$q_keyboards" == "true" ]]; then
 	echo "Synchronizing keyboard layouts."
 	# Update the keyboards (both ways).
 	for f in $( ls keyboards )
 	do
 		# Print a label.
-		echo "Checking keyboard '$f'"
+		echo "  Checking keyboard '$f'"
 		# Calculate the a differences.
 		d=$( diff keyboards/$f /usr/share/X11/xkb/symbols/$f )
 		# Check if differences are present.
