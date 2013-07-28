@@ -14,13 +14,13 @@
 
 # Default settings
 q_packages="false"
-q_skeleton="true"
+q_skeleton="false"
 q_dropbox="false"
 q_afs="false"
 q_root="false"
-q_local="true"
-q_settings="true"
-q_scripts="true"
+q_local="false"
+q_settings="false"
+q_scripts="false"
 q_keyboards="false"
 
 # System settings
@@ -306,6 +306,7 @@ if [ "$q_settings" == "true" ]; then
 	echo " "
 fi
 	
+
 # Matlab settings.
 if [ "$q_matlab" == "true" ]; then
 	echo "Synchronizing MATLAB settings."
@@ -330,7 +331,10 @@ fi
 # jEdit settings
 if [ "$q_jedit" == "true" && -d "$HOME/.jedit" ]; then
 	echo "Synchronizing jEdit settings."
-	 
+	# Make the directories if necessary.
+	mkdir -p "$HOME/.jedit"
+	mkdir -p "$HOME/.jedit/modes"
+	mkdir -p "$HOME/.jedit/keymaps"
 	# This is the main settings file.
 	update_both ".jedit/properties" "jedit/.jedit/properties" \
 	"$HOME/.jedit/properties"
@@ -345,7 +349,6 @@ if [ "$q_jedit" == "true" && -d "$HOME/.jedit" ]; then
 	rsync -ru $HOME/.jedit/modes/ jedit/.jedit/modes/
 	
 	echo " "
-	
 fi
 
 # Keyboards!
