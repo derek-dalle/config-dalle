@@ -315,6 +315,11 @@ if [ "$q_settings" == "true" ]; then
 	
 	
 	# jEdit settings
+	echo "  Synchronizing jEdit settings."
+	# Make the directories if necessary.
+	mkdir -p "$HOME/.jedit"
+	mkdir -p "$HOME/.jedit/modes"
+	mkdir -p "$HOME/.jedit/keymaps"
 	update_both ".jedit/properties" "jedit/.jedit/properties" \
 	"$HOME/.jedit/properties"
 	update_both "jEdit keymaps" "jedit/.jedit/keymaps/imported_keys.props" \
