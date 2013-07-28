@@ -303,18 +303,35 @@ if [ "$q_settings" == "true" ]; then
 	update_both ".bashrc" "bash/.bashrc" "$HOME/.bashrc"
 	update_both ".vimrc" "vim/.vimrc" "$HOME/.vimrc"
 	
-	# Matlab settings.
-	echo "  Synchronizing MATLAB settings."
+	echo " "
+fi
+	
+# Matlab settings.
+if [ "$q_matlab" == "true" ]; then
+	echo "Synchronizing MATLAB settings."
 	# Make the folders if necessary.
 	mkdir -p "$HOME/Documents"
 	mkdir -p "$HOME/Documents/MATLAB"
 	# Update files but don't copy new ones from local.
 	for f in $( ls "MATLAB" ); do
-		update_both "$f" "MATLAB/$f" "$HOME/Documents/MATLAB/$f"
+		if [ -f "MATLAB/$f" ]; then
+			# File; perform two-way synching.
+			update_both "$f" "MATLAB/$f" "$HOME/Documents/MATLAB/$f"
+		elif [ -d "MATLAB/$f" ]; then
+			echo "  Synchronizing MATLAB folder: '$f/'."
+			rsync -ru "MATLAB/$f/" "$HOME/Documents/MATLAB/$f/"
+			rsync -ru "$HOME/Documents/MATLAB/$f/" "MATLAB/$f/"
+		fi
 	done
+	echo " "
+fi
 	
-	
-	# jEdit settings
+
+# jEdit settings
+if [ "$q_jedit" == "true" && -d "$HOME/.jedit" ]; then
+	echo "Synchronizing jEdit settings."
+	 
+	# This is the main settings file.
 	update_both ".jedit/properties" "jedit/.jedit/properties" \
 	"$HOME/.jedit/properties"
 	update_both "jEdit keymaps" "jedit/.jedit/keymaps/imported_keys.props" \
@@ -326,6 +343,32 @@ if [ "$q_settings" == "true" ]; then
 	echo "  Synchronizing jEdit custom syntax highlighting."
 	rsync -ru jedit/.jedit/modes/ $HOME/.jedit/modes/
 	rsync -ru $HOME/.jedit/modes/ jedit/.jedit/modes/
+	
 	echo " "
 	
+fi
+
+# Keyboards!
+if [ "$q_root" == "true" && "$q_keyboards" == "true"]; then
+	echo "Synchronizing keyboard layouts."
+	# Update the keyboards (both ways).
+	for f in $( ls keyboards )
+	do
+		# Print a label.
+		echo "Checking keyboard '$f'"
+		# Calculate the a differences.
+		d=$( diff keyboards/$f /usr/share/X11/xkb/symbols/$f )
+		# Check if differences are present.
+		if [[ "$d" != "" ]]; then
+			# Say that a difference is present.
+			echo "  Files differ; synchronizing to most recent."
+			# Synchronize the files.
+			sudo rsync --update keyboards/$f /usr/share/X11/xkb/symbols/
+			sudo rsync --update /usr/share/X11/xkb/symbols/$f keyboards/
+		fi
+	done
+	echo " "
+elif [ "$q_keyboards" == "true" ]; then
+	echo "Requested keyboard synchronization, but without root privileges."
+	echo " "
 fi

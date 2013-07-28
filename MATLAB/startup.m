@@ -12,8 +12,6 @@ if ispc
 		addpath \\afs\umich.edu\user\d\a\dalle\Public\matlab\units\src\
 		% Add the path to set_plot.
 		addpath \\afs\umich.edu\user\d\a\dalle\Public\matlab\set_plot\src\
-		% Add the path to the prefs repository.
-		addpath \\afs\umich.edu\user\d\a\dalle\Public\matlab\prefs\src\
 	else
 		% Error messages
 		fprintf('The AFS directories could not be found.\n');
@@ -28,8 +26,6 @@ else
 		addpath /afs/umich.edu/user/d/a/dalle/Public/matlab/units/src/
 		% Add the path to set_plot.
 		addpath /afs/umich.edu/user/d/a/dalle/Public/matlab/set_plot/src/
-		% Add the path to the prefs repository.
-		addpath /afs/umich.edu/user/d/a/dalle/Public/matlab/prefs/src/
 	else
 		% Error messages
 		fprintf('The AFS directories could not be found.\n');
