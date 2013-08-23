@@ -20,6 +20,11 @@ xubuntu-desktop
 # To enable "module load matlab" and so forth
 environment-modules
 
+# Packages needed for XFlow
+libatlas-dev
+liblapack-dev
+freeglut3-dev
+
 # AFS pacakges
 krb5-user
 krb5-config
