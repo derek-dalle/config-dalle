@@ -1,0 +1,98 @@
+#!/bin/bash
+#
+# synch-relpath
+# synch-relpath $path
+#
+# This script prints the relative path to the current directory from one
+# of the possible base directories.  For example
+#
+#    synch-relpath /home/dalle/Documents/
+#
+# will print "Documents/".  If no argument is given, `pwd` will be used
+# as the input.
+#
+# The longest match of the input with the following list will be removed.
+#
+#    /home/*/
+#    /home/*/Dropbox/
+#    /afs/umich.edu/user/*/*/*/
+#    /scratch/*/*/
+#    /nobackup/*/
+#
+
+# Get the user name
+# This method will work even if called from sudo or AFS.
+IFS="/"
+listdir=( $HOME )
+IFS=""
+# Extract the name of the last folder in $HOME
+user=${listdir[-1]}
+
+# Check the input.
+if [ $# -lt 1 ]; then
+	# Default: use the current path.
+	fpath=`pwd`
+else
+	# User input
+	fpath=$1
+fi
+
+# Test if it is a relative path.
+if [ "${fpath:0:1}" != "/" ]; then
+	# Remember the current path.
+	curdir=`pwd`
+	# Switch to the given relative path.
+	cd $fpath
+	# Use the directory.
+	fpath=`pwd`
+	# Switch back to the original.
+	cd $curdir
+fi
+
+# Cut up input directory.
+IFS="/"
+fdirs=( $fpath )
+IFS=""
+# Number of folders in path.
+n_dirs=$(( ${#fdirs[@]} - 1))
+
+# Determine the "root" of the current directory.
+if [ "${fdirs[3]}" == "Dropbox" ]; then
+	# /home/user/Dropbox/
+	n_base=3
+elif [ "${fdirs[1]}" == "home" ]; then
+	# /home/user/
+	n_base=2
+elif [ "${fdirs[2]}" == "umich.edu" ]; then
+	# /afs/umich.edu/user/u/s/user/
+	n_base=6
+elif [ "${fdirs[1]}" == "scratch" ]; then
+	# /scratch/alloc_flux/user/
+	n_base=3
+elif [ "${gitdirs[1]}" == "nobackup" ]; then
+	# in the nobackup area
+	n_base=2
+else
+	# Unrecognized
+	exit
+fi
+
+# Initialize base path.
+base=""
+# Compile directories in the base of the path.
+for (( j=0;j<$n_base;j++ )); do
+	# Append.
+	base="$base/${fdirs[j+1]}"
+done
+
+# Initialize tail path.
+rpath=""
+# Compile directories in the base of the path.
+for (( j=$n_base;j<$n_dirs;j++ )); do
+	# Append.
+	rpath="$rpath${fdirs[j+1]}/"
+done
+
+# Output
+echo $rpath
+

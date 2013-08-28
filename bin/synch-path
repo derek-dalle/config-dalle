@@ -1,0 +1,86 @@
+#!/bin/bash
+#
+# synch-path $base
+# synch-path $base $path
+#
+# INPUTS:
+#    base : type of path to use as basis
+#    path : path to use (defaults to `pwd`)
+#
+# PRINTS:
+#         : full path based on $base and tail of $path
+#
+# This script prints the full path to a directory based on a given header
+# and tail portion.  Consider the following example.
+#
+#    $ synch-relpath afs /home/dalle/Documents/
+#    /afs/umich.edu/user/d/a/dalle/Documents/
+#
+# The recognized values for the $base input are below assuming that the
+# username is "dalle".
+#
+#    HOME_TYPE            Base directory
+#    (empty)              /afs/umich.edu/user/d/a/dalle/
+#    home                 /home/dalle/
+#    afs                  /afs/umich.edu/user/d/a/dalle/
+#    scratch              /scratch/kfid_flux/dalle/
+#    nobackup             /nobackup/dalle/
+#    dropbox              /home/dalle/Dropbox/
+#    uniqname (else)      /afs/umich.edu/user/u/n/uniqname
+#
+
+# Get the user name
+# This method will work even if called from sudo or AFS.
+IFS="/"
+listdir=( $HOME )
+IFS=""
+# Extract the name of the last folder in $HOME
+user=${listdir[-1]}
+
+# Determine basis to use.
+if [ $# -lt 1 ]; then
+	# Default: use the current path.
+	home_type="afs"
+else
+	# User input
+	home_type=$1
+fi
+
+# Determine path to use.
+if [ $# -lt 2 ]; then
+	# Default: use the current path.
+	fpath=`pwd`
+else
+	# User input
+	fpath=$2
+fi
+
+# Process the user input
+case "$home_type" in
+"Dropbox")
+	target="$HOME/Dropbox"
+	;;
+"home")
+	target="$HOME"
+	;;
+"scratch")
+	target="/scratch/kfid_flux/$user"
+	;;
+"nobackup")
+	target="/nobackup/$user"
+	;;
+"afs")
+	target="/afs/umich.edu/user/${user:0:1}/${user:1:1}/$user"
+	;;
+*)
+	user=$home_type
+	target="/afs/umich.edu/user/${user:0:1}/${user:1:1}/$user"
+	;;
+esac
+
+# Extract the relative portion of the path.
+rpath=$( synch-relpath $2 )
+
+# Print the target plus the relative portion of the path.
+echo $target/$rpath
+
