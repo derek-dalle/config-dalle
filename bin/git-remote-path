@@ -16,14 +16,15 @@
 # is the home of the Git repository, then the options available are
 # shown below assuming the user's name is "dalle"
 #
-#    HOME_TYPE            Base directory
-#    (empty)              /afs/umich.edu/user/d/a/dalle/
-#    home                 /home/dalle/
-#    afs                  /afs/umich.edu/user/d/a/dalle/
-#    scratch              /scratch/kfid_flux/dalle/
-#    nobackup             /nobackup/dalle/
-#    dropbox              /home/dalle/Dropbox/
-#    uniqname (else)      /afs/umich.edu/user/u/n/uniqname
+#    HOME_TYPE          Base directory
+#    (empty)            /afs/umich.edu/user/d/a/dalle/
+#    home               /home/dalle/
+#    afs                /afs/umich.edu/user/d/a/dalle/
+#    pegasus            dalle@aero-pegasus.engin.umich.edu:/home/dalle/
+#    scratch            /scratch/kfid_flux/dalle/
+#    nobackup           /nobackup/dalle/
+#    dropbox            /home/dalle/Dropbox/
+#    uniqname (else)    /afs/umich.edu/user/u/n/uniqname
 #    
 #
 
@@ -105,6 +106,9 @@ case "$home_type" in
 	;;
 "home")
 	target="$HOME"
+	;;
+"pegasus")
+	target="$user@aero-pegasus.engin.umich.edu:/home/$user/"
 	;;
 "scratch")
 	target="/scratch/kfid_flux/$user"

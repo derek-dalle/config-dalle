@@ -19,14 +19,15 @@
 # The recognized values for the $base input are below assuming that the
 # username is "dalle".
 #
-#    HOME_TYPE            Base directory
-#    (empty)              /afs/umich.edu/user/d/a/dalle/
-#    home                 /home/dalle/
-#    afs                  /afs/umich.edu/user/d/a/dalle/
-#    scratch              /scratch/kfid_flux/dalle/
-#    nobackup             /nobackup/dalle/
-#    dropbox              /home/dalle/Dropbox/
-#    uniqname (else)      /afs/umich.edu/user/u/n/uniqname
+#    HOME_TYPE          Base directory
+#    (empty)            /afs/umich.edu/user/d/a/dalle/
+#    home               /home/dalle/
+#    pegasus            dalle@aero-pegasus.engin.umich.edu:/home/dalle/
+#    afs                /afs/umich.edu/user/d/a/dalle/
+#    scratch            /scratch/kfid_flux/dalle/
+#    nobackup           /nobackup/dalle/
+#    dropbox            /home/dalle/Dropbox/
+#    uniqname (else)    /afs/umich.edu/user/u/n/uniqname
 #
 
 # Get the user name
@@ -60,6 +61,9 @@ case "$home_type" in
 "Dropbox")
 	target="$HOME/Dropbox"
 	;;
+"dropbox")
+	target="$HOME/Dropbox"
+	;;
 "home")
 	target="$HOME"
 	;;
@@ -71,6 +75,9 @@ case "$home_type" in
 	;;
 "afs")
 	target="/afs/umich.edu/user/${user:0:1}/${user:1:1}/$user"
+	;;
+"pegasus")
+	target="$user@aero-pegasus.engin.umich.edu:/home/$user"
 	;;
 *)
 	user=$home_type

@@ -1,0 +1,205 @@
+#!/bin/bash
+#
+# syto $home_type
+# syto $home_type [OPTIONS]
+#
+# NAME:
+#    syto - SYnchronize TO
+#
+# INPUTS:
+#    $home_type : basis of path to synchronize to (note 1)
+#
+# OPTIONS:
+#    -h : help prints out options and examples
+#    -d : delete files (if using RSYNC)
+#    -r : recursive (if using RSYNC)
+#    -f : force copying and do NOT use Git
+#
+# This script synchronizes a folder to its duplicate in another base location.
+# For example, if the current directory is
+#
+#    "/home/dalle/Documents/tex"
+#
+# then the following example will synchronize to the AFS folder
+#
+#    "/afs/umich.edu/user/d/a/dalle/Documents/tex"
+#
+# Here is the command:
+#
+#    $ pwd
+#    /home/dalle/Documents/tex
+#    $ syto afs
+#
+# If the current directory is a git repository, a git command will be used to
+# synchronize the directories.  Note that a `git push` command will be invoked,
+# which may not yield expected behavior.  If the current directory is not part
+# of any git repository, an `rsync` command is invoked.
+#
+#
+# NOTES:
+# (1) The recognized values for the $home_type input are below assuming that
+# the username is "dalle".
+#
+#    HOME_TYPE          Base directory
+#    (empty)            /afs/umich.edu/user/d/a/dalle/
+#    home               /home/dalle/
+#    pegasus            dalle@aero-pegasus.engin.umich.edu:/home/dalle/
+#    afs                /afs/umich.edu/user/d/a/dalle/
+#    scratch            /scratch/kfid_flux/dalle/
+#    nobackup           /nobackup/dalle/
+#    dropbox            /home/dalle/Dropbox/
+#    uniqname (else)    /afs/umich.edu/user/u/n/uniqname
+#
+
+# Versions:
+#  2013-08-28 @dalle   : First version
+
+
+# Default settings
+q_recursive="false"
+q_delete="false"
+q_git="true"
+
+# Default home_type to use.
+# I suspect at some point I will have this read from a special file.
+# Something like a "Make" or ".sync"
+home_type="afs"
+
+# Name of script used in this call
+scriptname="$0"
+
+# Functions
+# Function info
+usage() {
+	echo " Synchronization TO target."
+	echo "  "
+	echo " USAGE: $0 \$HOME_TYPE [options]"
+	echo "  "
+	echo " Available options:"
+	echo "   -h         Show available options"
+	echo "   -d         Delete"
+	echo "   -r         Recursive"
+	echo "   -f         Force copying and do NOT use Git"
+	echo " "
+	echo " The following options are available for the \$HOME_TYPE input."
+	echo " "
+	echo "     HOME_TYPE     Base directory"
+	echo "     (empty)       /afs/umich.edu/user/d/a/dalle/"
+	echo "     home          /home/dalle/"
+	echo "     pegasus       dalle@aero-pegasus.engin.umich.edu:/home/dalle/"
+	echo "     afs           /afs/umich.edu/user/d/a/dalle/"
+	echo "     scratch       /scratch/kfid_flux/dalle/"
+	echo "     nobackup      /nobackup/dalle/"
+	echo "     dropbox       /home/dalle/Dropbox/"
+	echo "     uniqname      /afs/umich.edu/user/u/n/uniqname/"
+	echo " "
+}
+
+# Display an unknown option.
+unknown_option() {
+	echo "  Unknown input option '$1'"
+	echo "  See $scriptname -help for valid options."
+	echo " "
+}
+
+
+# Display the header.
+echo " "
+echo "* Upload synchronization script *"
+echo "Invoked with: "
+echo " "
+echo "  $scriptname $@"
+echo " "
+
+# Process options
+while [[ $1 ]]; do
+	# Check the option.
+	case $1 in
+	-help | -h)
+		# Display usage information.
+		usage
+		;;
+	-r)
+		q_recursive="true"
+		;;
+	-d)
+		q_delete="true"
+		;;
+	-f)
+		q_git="false"
+		;;
+	-*)
+		# Option but not recognized
+		unknown_option $1
+		;;
+	*)
+		# Assume this is the base path.
+		home_type="$1"
+		;;
+	esac
+	# Shift the arguments.
+	shift
+done
+
+# Current path
+cur_path=$( pwd )
+# Form the output path.
+to_path=$( synch-path $home_type )
+# Check for discrepancy
+if [ "$cur_path" == "$to_path" ]; then
+	echo "Target path matches current path; exiting"
+	exit 0
+fi
+
+# Try to get the name of the git repository to push to.
+git_rpath=$( git-remote-path $home_type )
+
+# Check if it is empty or if non-git was requested.
+if [[ "$q_git" != "false" && "$git_rpath" != "" ]]; then
+	# USING GIT TO SYNCHRONIZE
+	echo "Using GIT to synchronize."
+	echo " "
+	# Check if the remote exists.
+	rfind=$( git remote | grep $home_type )
+	if [ "$rfind" == "" ]; then
+		# Add the remote.
+		echo " Adding a remote for $home_type, invoked using:"
+		echo "    git remote add $home_type $git_rpath"
+		echo " "
+		# Actually do it.
+		git remote add $home_type $git_rpath
+	fi
+	# Status indicator about the push command.
+	echo " Pushing to remote $home_type using command:"
+	echo "    git push $home_type master"
+	echo " "
+	# Push.
+	git push $home_type master
+else
+	# USING RSYNC TO SYNCHRONIZE
+	echo "Using RSYNC to synchronize."
+	echo " "
+	# Report the settings.
+	echo " Settings:"
+	echo "    Recursive: $q_recursive"
+	echo "       Delete: $q_delete"
+	echo " "
+	# Header for command
+	echo " Synchronizing with the following command:"
+	# Universal options: keep mod times, only update, and allow compression.
+	rsync_o="-t -u -z"
+	# Check for deletion setting. (DANGER!)
+	if [ "$q_delete" == "true" ]; then
+		rsync_o="$rsync_o --delete"
+	fi
+	# Check for recursive setting.
+	if [ "$q_recursive" == "true" ]; then
+		rsync_o="$rsync_o -r"
+	fi
+	# Print the command to be used.
+	echo "    rsync . $to_path $rsync_o"
+	echo " "
+	# Run it.
+	rsync . $to_path $rsync_o
+fi
+
