@@ -1,5 +1,5 @@
 #jEdit properties
-#Thu Jul 25 09:45:42 EDT 2013
+#Mon Aug 26 18:43:00 EDT 2013
 useMD5forDirtyCalculation=false
 metal.primary.fontsize=11
 sortBuffers=false
@@ -155,7 +155,7 @@ console.error.msvc.testtext=\n\n\n\n\n
 plugin-blacklist.QuickNotepad.jar=false
 view.status.background=\#ffffff
 search.regexp.toggle=false
-Global\ Options.last=editing
+Global\ Options.last=shortcuts
 vfs.browser.size.width=40
 vfs.browser.splitter=127
 plugin-blacklist.LatestVersion.jar=false
