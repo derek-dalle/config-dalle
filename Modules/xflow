@@ -1,0 +1,23 @@
+#%Module1.0############################################################
+##
+## xflow modulefile
+##
+proc ModulesHelp { } {
+	global version modroot
+
+	puts stderr"\n\tThis module configures XFlow\n"
+}
+
+# Explain the file.
+module-whatis "loads XFlow"
+
+# Module parameters
+set     app        xflow
+set     version    current
+
+# Modules in conflict
+conflict xflow
+
+# Folders to add to path
+prepend-path PATH             ~/usr/local/xflow/bin
+prepend-path LD_LIBRARY_PATH  ~/usr/local/xflow/lib
