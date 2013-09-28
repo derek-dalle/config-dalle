@@ -25,7 +25,7 @@ fi
 
 # Module path
 if [[ "$MODULEPATH" == "" ]]; then
-	# Source the stupid package that never works.
+# Source the stupid package that never works.
 	. /usr/share/modules/init/bash
 fi
 # Now add the useful part of the path.
