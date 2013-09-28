@@ -11,6 +11,8 @@ inkscape
 ipython
 jedit
 matlab-support
+python-matplotlib
+python-mpltoolkits.basemap
 nautilus-dropbox
 synapse
 texlive-full
@@ -19,6 +21,9 @@ xubuntu-desktop
 
 # To enable "module load matlab" and so forth
 environment-modules
+
+# Packages needed for pyxflow
+python-dev
 
 # Packages needed for XFlow
 libatlas-dev
