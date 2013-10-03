@@ -31,12 +31,7 @@
 #
 
 # Get the user name
-# This method will work even if called from sudo or AFS.
-IFS="/"
-listdir=( $HOME )
-IFS=""
-# Extract the name of the last folder in $HOME
-user=${listdir[-1]}
+user=$USER
 
 # Determine basis to use.
 if [ $# -lt 1 ]; then
