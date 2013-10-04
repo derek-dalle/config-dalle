@@ -30,8 +30,8 @@
 #    uniqname (else)    /afs/umich.edu/user/u/n/uniqname
 #
 
-# Get the user name
-user=$USER
+# Get the user name. This works even with sudo
+user=${HOME##*/}
 
 # Determine basis to use.
 if [ $# -lt 1 ]; then
