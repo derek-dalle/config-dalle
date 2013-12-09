@@ -70,15 +70,13 @@ scriptname="$0"
 # Functions
 # Function info
 usage() {
-	echo " Synchronization FROM target."
+	echo " Git clone command with most of full path filled in."
 	echo "  "
-	echo " USAGE: $0 \$HOME_TYPE [options]"
+	echo " USAGE: $0 \$HOME_TYPE \$REPO_NAME"
 	echo "  "
 	echo " Available options:"
-	echo "   -h         Show available options"
-	echo "   -d         Delete"
-	echo "   -r         Recursive"
-	echo "   -f         Force copying and do NOT use Git"
+	echo "   -h         Show help"
+	echo "   -b         Makes a bare repository"
 	echo " "
 	echo " The following options are available for the \$HOME_TYPE input."
 	echo " "
@@ -104,11 +102,19 @@ unknown_option() {
 
 # Display the header.
 echo " "
-echo "* Download synchronization script *"
+echo "* Git clone convenience script *"
 echo "Invoked with: "
 echo " "
 echo "  $scriptname $@"
 echo " "
+
+# Initialize two input variables.
+# Base path type
+home_type=""
+# Name of the repository (folder) cloning from
+repo_name=""
+# Whether or not to use a bare
+q_bare="false"
 
 # Process options
 while [[ $1 ]]; do
@@ -119,26 +125,29 @@ while [[ $1 ]]; do
 		usage
 		exit 0
 		;;
-	-r)
-		# Folder recursion for rsync
-		q_recursive="true"
-		;;
-	-d)
-		# Extra file deletion for rsync
-		q_delete="true"
-		;;
-	-f)
-		# Prevent the use of git.
-		q_git="false"
-		;;
+    -b | -bare | --bare)
+        # Make a bare repository
+        q_bare="true"
+        ;;
 	-*)
 		# Option but not recognized
 		unknown_option $1
 		exit 1
 		;;
 	*)
-		# Assume this is the base path.
-		home_type="$1"
+		# Regular input
+		if [ "$home_type" == "" ]; then
+		    # Base path type
+		    home_type="$1"
+		elif [ "$repo_name" == "" ]; then
+		    # Name of the repository
+		    repo_name="$1"
+		else
+		    # Extra inputs.
+		    echo "Extra inputs given."
+		    usage
+		    exit 1
+		fi
 		;;
 	esac
 	# Shift the arguments.
@@ -155,55 +164,35 @@ if [ "$cur_path" == "$to_path" ]; then
 	exit 0
 fi
 
-# Try to get the name of the git repository to pull from.
-git_rpath=$( git-remote-path $home_type )
+# Check if we are already in a repository!
+if [ "$( git-dir )" != "" ]; then
+    echo "Already in a git repository!"
+    echo "Exiting"
+    exit 1
+fi
 
 # Check if it is empty or if non-git was requested.
-if [[ "$q_git" != "false" && "$git_rpath" != "" ]]; then
+if [ "$to_path" != "" ]; then
 	# USING GIT TO SYNCHRONIZE
-	echo "Using GIT to synchronize."
+	echo "Using GIT to clone."
 	echo " "
-	# Check if the remote exists.
-	rfind=$( git remote | grep $home_type )
-	if [ "$rfind" == "" ]; then
-		# Add the remote.
-		echo " Adding a remote for $home_type, invoked using:"
-		echo "    git remote add $home_type $git_rpath"
-		echo " "
-		# Actually do it.
-		git remote add $home_type $git_rpath
-	fi
 	# Status indicator about the push command.
-	echo " Pulling from remote $home_type using command:"
-	echo "    git pull $home_type master"
+	echo " Cloning using command:"
+	echo "    git clone $to_path$repo_name"
 	echo " "
-	# Push.
-	git pull $home_type master
+	# Clone, checking for --bare option
+	if [ "$q_bare" == "true" ]; then
+	    # Bare repository
+	    git clone $to_path$repo_name master --bare
+	else
+	    # Regular repository
+	    git clone $to_path$repo_name master
+	fi
 else
-	# USING RSYNC TO SYNCHRONIZE
-	echo "Using RSYNC to synchronize."
-	echo " "
-	# Report the settings.
-	echo " Settings:"
-	echo "    Recursive: $q_recursive"
-	echo "       Delete: $q_delete"
-	echo " "
-	# Header for command
-	echo " Synchronizing with the following command:"
-	# Universal options: keep mod times, only update, and allow compression.
-	rsync_o="-t -u -z"
-	# Check for deletion setting. (DANGER!)
-	if [ "$q_delete" == "true" ]; then
-		rsync_o="$rsync_o --delete"
-	fi
-	# Check for recursive setting.
-	if [ "$q_recursive" == "true" ]; then
-		rsync_o="$rsync_o -r"
-	fi
-	# Print the command to be used.
-	echo "    rsync $to_path . $rsync_o"
-	echo " "
-	# Run it.
-	rsync $to_path . $rsync_o
+	# NO REPOSITORY FOUND
+	echo "No repository found at"
+	echo "   $to_path$repo_name"
+	echo ""
+	echo "Exiting"
 fi
 
