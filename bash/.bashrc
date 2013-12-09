@@ -25,7 +25,7 @@ fi
 
 # Module path
 if [[ "$MODULEPATH" == "" ]]; then
-# Source the stupid package that never works.
+	# Source the stupid package that never works.
 	. /usr/share/modules/init/bash
 fi
 # Now add the useful part of the path.
@@ -70,7 +70,7 @@ if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
 fi
 
 # Set a convenient prompt that also updates the window title.
-PS1="\[\e]0;\h:\w\a\]\u@\h$ "
+PS1="\[\e]0;\h:\w\a\]\h/\W$ "
 
 # Convenient login commands
 alias ssh-pegasus='ssh -X dalle@aero-pegasus.engin.umich.edu'
