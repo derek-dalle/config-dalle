@@ -70,7 +70,7 @@ if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
 fi
 
 # Set a convenient prompt that also updates the window title.
-PS1="\[\e]0;\h:\w\a\]\h/\W$ "
+PS1="\[\e]0;\h:\w\a\]\h:\W$ "
 
 # Convenient login commands
 alias ssh-pegasus='ssh -X dalle@aero-pegasus.engin.umich.edu'
