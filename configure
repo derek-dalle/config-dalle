@@ -386,6 +386,7 @@ if [ "$q_settings" == "true" ]; then
 	
 	# Do two-way updates on some dotfiles.
 	update_both ".bashrc" "bash/.bashrc" "$HOME/.bashrc"
+	update_both ".bash_profile" "bash/.bash_profile" "$HOME/.bash_profile"
 	update_both ".vimrc" "vim/.vimrc" "$HOME/.vimrc"
 	
 	echo " "
