@@ -183,10 +183,10 @@ if [ "$to_path" != "" ]; then
 	# Clone, checking for --bare option
 	if [ "$q_bare" == "true" ]; then
 	    # Bare repository
-	    git clone $to_path$repo_name master --bare
+	    git clone $to_path$repo_name --bare
 	else
 	    # Regular repository
-	    git clone $to_path$repo_name master
+	    git clone $to_path$repo_name
 	fi
 else
 	# NO REPOSITORY FOUND
