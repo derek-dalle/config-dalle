@@ -399,6 +399,8 @@ if [ "$q_matlab" == "true" ]; then
 	# Make the folders if necessary.
 	mkdir -p "$HOME/Documents"
 	mkdir -p "$HOME/Documents/MATLAB"
+	# Perform two-way synchronization on the Octave settings file.
+	update_both "octave/.octaverc" "$HOME/.octaverc"
 	# Update files but don't copy new ones from local.
 	for f in $( ls "MATLAB" ); do
 		if [ -f "MATLAB/$f" ]; then

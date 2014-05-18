@@ -1,0 +1,75 @@
+% Formatting
+format('compact')
+
+% Define the "USERPATH" function
+function upath = userpath
+    %USERPATH Return the user path
+    %
+    % CALL:
+    %    >> upath = userpath
+    %
+    % INPUTS:
+    %    (None)
+    %
+    % OUTPUTS:
+    %    upath : list of directories on the userpath
+    
+    % Versions:
+    %  2014.05.10 @dalle   : First version
+    
+    % Get the value of $HOME
+    if isunix
+        % Linux
+        [~, hpath] = system('echo $HOME');
+    else
+        % Windows
+        [~, hpath] = system('echo %HOME');
+    end
+    % Remove the last char.
+    hpath = hpath(1:end-1);
+    % Make the userpath
+    upath = [hpath, filesep, 'Documents', filesep, 'MATLAB', pathsep];
+endfunction
+
+% Missing function to join folder and file names
+function fname = fullpath(varargin)
+    %FULLPATH Concatenate folder and file names
+    %
+    % CALL:
+    %    >> fullpath(part1, part2, ... )
+    %    >> fullpath('folder', 'sub', 'tmp.txt')
+    %    ans = folder/sub/tmp.txt
+    %
+    % INPUTS:
+    %    part1 : folder or file partial name (relative or absolute)
+    %    part2 : folder or file partial name
+    %
+    % OUTPUTS:
+    %    fname : concatenation of all the input parts
+    
+    % Versions:
+    %  2014.05.09 @dalle   : First version
+    
+    % Check for inputs.
+    if nargin == 0, fname = ''; return; end
+    % Create a cell array of file separators.
+    f = cell(1, nargin);
+    % Turn the entries of this cell into file separators.
+    [f{:}] = deal(filesep);
+    % Join the two cell arrays.
+    c = [varargin; f];
+    % Concatenate all the values.
+    fname = [c{:}];
+    % Drop the last character.
+    fname(end) = [];
+endfunction
+
+
+% Get the userpath
+upath = userpath;
+upath = upath(1:end-1);
+% Add the base part of the path that Octave doesn't have.
+addpath(upath)
+
+% Run the normal startup file.
+startup
