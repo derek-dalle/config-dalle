@@ -25,11 +25,20 @@ fi
 
 # Module path
 if [[ "$MODULEPATH" == "" ]]; then
-	# Source the stupid package that never works.
-	. /usr/share/modules/init/bash
+    # Source the stupid package that never works.
+    . /usr/share/modules/init/bash
 fi
 # Now add the useful part of the path.
 MODULEPATH="$HOME/Modules:$MODULEPATH"
+
+# Python path
+if [[ "$PYTHONPATH" == "" ]]; then
+    # Create a new Python path.
+    export PYTHONPATH="$HOME/Documents/Python"
+else
+    # Append to the Python path.
+    export PYTHONPATH="$PYTHONPATH:$HOME/Documents/Python"
+fi
 
 # If not running interactively, don't do anything.
 [ -z "$PS1" ] && return

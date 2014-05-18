@@ -33,8 +33,8 @@ set ruler
 " set number
 
 " Keep using tabs, but only two spaces.
-set tabstop=2
-set shiftwidth=2
+set tabstop=4
+set shiftwidth=4
 
 " Apparently better command-line completion?
 set wildmenu
