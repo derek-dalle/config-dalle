@@ -93,3 +93,11 @@ alias matlab-2011a='/usr/local/MATLAB/R2011a/bin/matlab'
 bind '"\e[A": history-search-backward'
 bind '"\e[B": history-search-forward'
 
+# Check the computer's hostname for non-universal commands.
+if [[ "$HOSTNAME" == *".nas.nasa.gov" ]]; then
+	# Starts a socket to the supercomputers
+    alias ssh-sfe='ssh -fN sfe-master'
+	alias ssh-pfe='ssh pfe'
+	# Increase the stack size.
+	ulimit -s 4194304
+fi
