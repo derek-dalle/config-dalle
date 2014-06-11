@@ -21,6 +21,10 @@ syntax on
 " Automatic indenting is a nice addition.
 set autoindent
 
+" Always use spaces instead of tabs
+set smarttab
+set expandtab
+
 " Let the backspace function in a sane way.
 set backspace=indent,eol,start
 
