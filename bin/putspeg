@@ -1,0 +1,12 @@
+#!/bin/bash
+# Create an archive to /tmp/tmp.tgz and send it to the same location on
+# aero-pegasus.engin.umich.edu
+
+# Versions:
+#  2014.06.27 @ddalle  : First version
+
+# Create the archive.
+tar -czf /tmp/tmp.tgz "$@"
+
+# Send it to pegasus.
+scp /tmp/tmp.tgz aero-pegasus.engin.umich.edu:/tmp/
