@@ -9,5 +9,6 @@
 <MODE NAME="css" FILE="css.xml" FILE_NAME_GLOB="*.css" />
 <MODE NAME="php" FILE="php.xml" FILE_NAME_GLOB="*.php" />
 <MODE NAME="json" FILE="json.xml" FILE_NAME_GLOB="*.json" />
+<MODE NAME="matlab" FILE="matlab.xml" FILE_NAME_GLOB="*.{m,asv}" />
 
 </MODES>
