@@ -10,5 +10,7 @@
 <MODE NAME="php" FILE="php.xml" FILE_NAME_GLOB="*.php" />
 <MODE NAME="json" FILE="json.xml" FILE_NAME_GLOB="*.json" />
 <MODE NAME="matlab" FILE="matlab.xml" FILE_NAME_GLOB="*.{m,asv}" />
-
+<MODE NAME="python" FILE="python.xml" 
+				FILE_NAME_GLOB="*.{py,pyw,sc,jy}"
+				FIRST_LINE_GLOB="#!*/*python*" />
 </MODES>
