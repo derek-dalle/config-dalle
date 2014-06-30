@@ -1,0 +1,14 @@
+#!/bin/bash
+# Fetch the file /tmp/tmp.tgz from aero-pegasus.engin.umich.edu and untar it.
+
+# Versions:
+#  2014.06.27 @ddalle  : First version
+
+# Fetch the tarball.
+scp aero-pegasus.engin.umich.edu:/tmp/tmp.tgz .
+
+# Untar it.
+tar -xzf tmp.tgz
+
+# Delete the tarball.
+rm tmp.tgz
