@@ -18,15 +18,15 @@ module() { eval `/usr/bin/modulecmd $modules_shell $*`; }
 # Prepend local folders to relevant paths.
 # General path
 if [ -z $PATH ]; then
-    PATH="$HOME/bin:$HOME/usr/bin:$HOME/usr/local/bin"
+	PATH="$HOME/usr/bin:$HOME/usr/local/bin"
 else
-    PATH="$HOME/bin:$HOME/usr/bin:$HOME/usr/local/bin/:$PATH"
+	PATH="$HOME/usr/bin:$HOME/usr/local/bin/:$PATH"
 fi
 
 # Module path
 if [[ "$MODULEPATH" == "" ]]; then
-    # Source the environment module thing to tell it what shell is being used.
-    . $MODULESHOME/init/bash
+    # Source the stupid package that never works.
+    . /usr/share/modules/init/bash
 fi
 # Now add the useful part of the path.
 MODULEPATH="$HOME/Modules:$MODULEPATH"
@@ -81,57 +81,15 @@ fi
 # Set a convenient prompt that also updates the window title.
 PS1="\[\e]0;\h:\w\a\]\h:\W$ "
 
+# Convenient login commands
+alias ssh-pegasus='ssh -X dalle@aero-pegasus.engin.umich.edu'
+alias ssh-flux='ssh flux-login.engin.umich.edu'
+
+# Commands to launch MATLAB by version
+alias matlab-2012a='/usr/local/MATLAB/R2012a/bin/matlab'
+alias matlab-2011a='/usr/local/MATLAB/R2011a/bin/matlab'
+
 # MATLAB-like searching with up arrow
 bind '"\e[A": history-search-backward'
 bind '"\e[B": history-search-forward'
-
-# Login to my server.
-alias ssh-pegasus='ssh -X dalle@aero-pegasus.engin.umich.edu'
-
-# NAS secure server
-alias ssh-sfe='ssh -Y ddalle@sfe1.nas.nasa.gov'
-
-# University of Michigan server (generic)
-alias ssh-itcs='ssh -X dalle@login.itcs.umich.edu'
-# University of Michigan with MATLAB
-alias ssh-umich='ssh -X dalle@scs.itd.umich.edu'
-
-
-# University of Michigan computers
-if [[ "$HOSTNAME" == *".engin.umich.edu" ]]; then
-    # Clusters
-    alias ssh-flux='ssh flux-login.engin.umich.edu'
-    alias ssh-nyx='ssh nyx-login.engin.umich.edu'
-    # CAEN login machines
-    alias ssh-login='ssh -Y login.engin.umich.edu'
-fi
-
-# Server-specific commands
-if [[ "$HOSTNAME" == "aero-pegasus" ]]; then
-    # Commands to launch MATLAB by version
-    alias matlab-2012a='/usr/local/MATLAB/R2012a/bin/matlab'
-    alias matlab-2011a='/usr/local/MATLAB/R2011a/bin/matlab'
-fi
-
-# NASA NAS workstations
-if [[ "$HOSTNAME" == *".nas.nasa.gov" ]]; then
-    # Starts a socket to secure computing.
-    alias sfe-master='ssh -fN sfe-master'
-    # Relatively obvious aliases just in case I forget them
-    alias ssh-pfe='ssh pfe'
-    alias ssh-bridge='ssh bridge3'
-    alias ssh-lfe='ssh lfe'
-    # Increase the stack size (for Cart3D, at the very least)
-    ulimit -s 4194304
-fi
-
-# Pleiades nodes
-if [[ "$HOSTNAME" == "pfe"* ]]; then
-    # Add additional modulefiles
-    module use -a $HOME/share/modulefiles
-    # Make CSH work
-    alias csh='LS_COLORS="" csh'
-    # Increase the stack size (for Cart3D, at the very least)
-    ulimit -s 4194304
-fi
 
