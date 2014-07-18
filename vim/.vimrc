@@ -10,11 +10,6 @@ set mouse=a
 " I'm worried about this setting.
 set nocompatible
 
-" Determine type of file based on name and possibly contents.
-" Apparently it affects auto-indent as well.
-" This is almost always turned on, anyway.
-filetype indent plugin on
-
 " Obviously syntax highlightings was already on.
 syntax on
 
