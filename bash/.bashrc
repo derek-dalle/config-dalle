@@ -129,6 +129,8 @@ fi
 if [[ "$HOSTNAME" == "pfe"* ]]; then
     # Add additional modulefiles
     module use -a $HOME/share/modulefiles
+    # Make CSH work
+    alias csh='LS_COLORS="" csh'
     # Increase the stack size (for Cart3D, at the very least)
     ulimit -s 4194304
 fi
