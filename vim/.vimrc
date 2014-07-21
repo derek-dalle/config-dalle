@@ -30,6 +30,8 @@ set ruler
 " Keep using tabs, but only two spaces.
 set tabstop=4
 set shiftwidth=4
+" Put spaces only.
+set expandtab
 
 " Apparently better command-line completion?
 set wildmenu
