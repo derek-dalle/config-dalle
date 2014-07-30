@@ -452,10 +452,10 @@ if [[ "$q_root" == "true" && "$q_keyboards" == "true" ]]; then
 		# Check if differences are present.
 		if [[ "$d" != "" ]]; then
 			# Say that a difference is present.
-			echo "  Files differ; synchronizing to most recent."
+			echo "  Files differ; using repository versions"
 			# Synchronize the files.
-			sudo rsync --update keyboards/$f /usr/share/X11/xkb/symbols/
-			sudo rsync --update /usr/share/X11/xkb/symbols/$f keyboards/
+            sudo mv /usr/share/X11/xkb/symbols/$f /usr/share/X11/xkb/symbols/$f.old
+			sudo cp -f keyboards/$f /usr/share/X11/xkb/symbols/
 		fi
 	done
 	echo " "
