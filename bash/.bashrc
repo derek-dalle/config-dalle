@@ -126,7 +126,7 @@ if [[ "$HOSTNAME" == *".nas.nasa.gov" ]]; then
 fi
 
 # Pleiades nodes
-if [[ "$HOSTNAME" == "pfe"* ]]; then
+if [[ "$HOSTNAME" == "pfe"*  || "$HOSTNAME" == "bridge"* ]]; then
     # Add additional modulefiles
     module use -a $HOME/share/modulefiles
     # Prevent CSH from choking on colors.
@@ -135,3 +135,10 @@ if [[ "$HOSTNAME" == "pfe"* ]]; then
     ulimit -s 4194304
 fi
 
+# LOU storage node
+if [[ "$HOSTNAME" == "lfe"* ]]; then
+    # Get rid of colors completely (appears not to really matter).
+    export LS_COLORS=""
+    # I want git for this.
+    module load git
+fi
