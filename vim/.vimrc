@@ -27,7 +27,7 @@ set ruler
 " On a related note, did not know vim can show line numbers
 " set number
 
-" Keep using tabs, but only two spaces.
+" Always, always use 4 spaces for a tab
 set tabstop=4
 set shiftwidth=4
 " Put spaces only.
