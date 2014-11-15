@@ -135,3 +135,13 @@ if [[ "$HOSTNAME" == "pfe"* ]]; then
     ulimit -s 4194304
 fi
 
+# More Pleiades nodes
+if [[ "$HOSTNAME" == "bridge"* ]]; then
+    # Add additional modulefiles
+    module use -a $HOME/share/modulefiles
+    # Prevent CSH from choking on colors.
+    alias csh='LS_COLORS="" csh'
+    # Increase the stack size (for Cart3D, at the very least)
+    ulimit -s 4194304
+fi
+
