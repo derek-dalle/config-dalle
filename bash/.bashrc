@@ -23,6 +23,11 @@ else
     PATH="$HOME/bin:$HOME/usr/bin:$HOME/usr/local/bin/:$PATH"
 fi
 
+# Place where environment moudles hang out.
+if [[ "$MODULESHOME" == "" ]]; then
+    export MODULESHOME="/usr/share/modules"
+fi
+
 # Module path
 if [[ "$MODULEPATH" == "" ]]; then
     # Source the environment module thing to tell it what shell is being used.
@@ -38,6 +43,11 @@ if [[ "$PYTHONPATH" == "" ]]; then
 else
     # Append to the Python path.
     export PYTHONPATH="$PYTHONPATH:$HOME/Documents/Python"
+fi
+
+# Make sure Git is loaded.
+if [[ "$HOSTNAME" == "pfe"* ]] || [[ "$HOSTNAME" == "bridge"* ]]; then
+    module load git
 fi
 
 # If not running interactively, don't do anything.
@@ -126,17 +136,7 @@ if [[ "$HOSTNAME" == *".nas.nasa.gov" ]]; then
 fi
 
 # Pleiades nodes
-if [[ "$HOSTNAME" == "pfe"* ]]; then
-    # Add additional modulefiles
-    module use -a $HOME/share/modulefiles
-    # Prevent CSH from choking on colors.
-    alias csh='LS_COLORS="" csh'
-    # Increase the stack size (for Cart3D, at the very least)
-    ulimit -s 4194304
-fi
-
-# More Pleiades nodes
-if [[ "$HOSTNAME" == "bridge"* ]]; then
+if [[ "$HOSTNAME" == "pfe"* ]] || [[ "$HOSTNAME" == "bridge"* ]]; then
     # Add additional modulefiles
     module use -a $HOME/share/modulefiles
     # Prevent CSH from choking on colors.
