@@ -48,6 +48,7 @@ fi
 # Make sure Git is loaded.
 if [[ "$HOSTNAME" == "pfe"* ]] || [[ "$HOSTNAME" == "bridge"* ]]; then
     module load git
+    umask 0027
 fi
 
 # If not running interactively, don't do anything.
