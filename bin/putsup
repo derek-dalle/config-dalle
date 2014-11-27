@@ -6,7 +6,7 @@
 #  2014-06-27 @ddalle  : First version
 
 # Create the archive.
-tar -czf /tmp/tmp.tgz "$@"
+tar -czf ~/tmp/tmp.tgz "$@"
 
 # Send it to pegasus.
-scp /tmp/tmp.tgz dalle@aero-pegasus.engin.umich.edu:/tmp/
+scp ~/tmp/tmp.tgz bridge3:/tmp/
