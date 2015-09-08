@@ -5,7 +5,7 @@
 #  2014-06-27 @ddalle  : First version
 
 # Fetch the tarball.
-scp dalle@aero-pegasus.engin.umich.edu:/tmp/tmp.tgz .
+scp bridge3:/nobackupp8/ddalle/tmp/tmp.tgz .
 
 # Untar it.
 tar -xzf tmp.tgz

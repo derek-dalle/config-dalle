@@ -1,0 +1,90 @@
+stricthostkeychecking=no
+
+Host pfe pfe-last pfe.nas.nasa.gov pfe-last.nas.nasa.gov
+        HostbasedAuthentication no
+        LogLevel                quiet
+        HostKeyAlias            pfe1.nas.nasa.gov
+        ProxyCommand            ssh sfe-slave /usr/local/bin/ssh-balance %h
+
+Host pfe21
+        HostbasedAuthentication no
+        LogLevel                quiet
+        ProxyCommand            ssh sfe-slave /usr/local/bin/ssh-proxy %h
+	
+Host pfe22
+        HostbasedAuthentication no
+        LogLevel                quiet
+        ProxyCommand            ssh sfe-slave /usr/local/bin/ssh-proxy %h
+
+Host pfe23
+        HostbasedAuthentication no
+        LogLevel                quiet
+        ProxyCommand            ssh sfe-slave /usr/local/bin/ssh-proxy %h
+
+Host pfe24
+        HostbasedAuthentication no
+        LogLevel                quiet
+        ProxyCommand            ssh sfe-slave /usr/local/bin/ssh-proxy %h
+
+Host pfe25
+        HostbasedAuthentication no
+        LogLevel                quiet
+        ProxyCommand            ssh sfe-slave /usr/local/bin/ssh-proxy %h
+
+Host pfe26
+        HostbasedAuthentication no
+        LogLevel                quiet
+        ProxyCommand            ssh sfe-slave /usr/local/bin/ssh-proxy %h
+
+Host pfe27
+		HostbasedAuthentication no
+		LogLevel                quiet
+		ProxyCommand            ssh sfe-slave /usr/local/bin/ssh-proxy %h
+
+Host lfe1
+        HostbasedAuthentication no
+        LogLevel                quiet
+        ProxyCommand            ssh sfe-slave /usr/local/bin/ssh-proxy %h
+
+Host lfe2
+        HostbasedAuthentication no
+		LogLevel                quiet
+		ProxyCommand            ssh sfe-slave /usr/local/bin/ssh-proxy %h
+
+Host lfe3
+        HostbasedAuthentication no
+		LogLevel                quiet
+		ProxyCommand            ssh sfe-slave /usr/local/bin/ssh-proxy %h
+
+Host lfe4
+        HostbasedAuthentication no
+        LogLevel                quiet
+        ProxyCommand            ssh sfe-slave /usr/local/bin/ssh-proxy %h
+
+Host bridge1
+        HostbasedAuthentication no
+        LogLevel                quiet
+        ProxyCommand            ssh sfe-slave /usr/local/bin/ssh-proxy %h
+
+Host bridge2
+        HostbasedAuthentication no
+        LogLevel                quiet
+        ProxyCommand            ssh sfe-slave /usr/local/bin/ssh-proxy %h
+
+Host bridge3
+        HostbasedAuthentication no
+        LogLevel                quiet
+        ProxyCommand            ssh sfe-slave /usr/local/bin/ssh-proxy %h
+
+Host bridge4
+		HostbasedAuthentication no
+		LogLevel                quiet
+		ProxyCommand            ssh sfe-slave /usr/local/bin/ssh-proxy %h
+	
+Host sfe-master
+        ControlMaster           yes
+        ControlPath             ~/.ssh/sfe.sock
+        HostName                sfe2.nas.nasa.gov
+
+Host sfe-slave
+        ControlPath             ~/.ssh/sfe.sock
