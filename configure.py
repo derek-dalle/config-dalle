@@ -59,6 +59,7 @@ import subprocess as sp
 opts = {
     "root": False,
     "packages": False,
+    "settings": False,
     "dropbox": False,
     "local": False,
     "scripts": False,
@@ -184,6 +185,7 @@ def PrintSettings():
     print("Specific programs:")
     print("  %27s: %s" % ('jEdit', opts['jedit']))
     print("  %27s: %s" % ('MATLAB', opts['matlab']))
+    print(" ")
     
     
 # Unknown option
@@ -218,6 +220,8 @@ def UpdateFile(fsrc, fdst, sudo=False):
     :Versions:
         * 2015-09-07 ``@ddalle``: First version
     """
+    # Status update.
+    print("  %s --> %s" % (fsrc, fdst))
     # Check if source file exists.
     if not os.path.isfile(fsrc):
         print("  File '%s' does not exist." % fsrc)
@@ -229,24 +233,26 @@ def UpdateFile(fsrc, fdst, sudo=False):
         tdst = os.path.getmtime(fdst)
         # Check for newer destination.
         if tdst > tsrc:
-            print("  File '%s' is newer than repository version; aborting."
-                % fdst)
+            print("    Working version is newer; aborting.")
             return
     # Copy the file.
     if sudo and opts.get('root'):
         # Sudo copy
+        print("    Updating with root privileges")
         sp.call(['sudo', 'cp', fsrc, fdst])
     elif sudo:
         # No permissions
-        print("  Cannot update '%s' --> '%s' without root." % (fsrc, fdst))
+        print("    Cannot update without root privileges")
     else:
         # Status update
-        print("  Updating '%s' --> '%s'")
+        print("    Updating")
         # Normal copy
         shutil.copy(fsrc, fdst)
         
 # Update folder recursively.
 def UpdateDir(fdir, fdst, sudo=False):
+    # Save location
+    fpwd = os.getcwd()
     # Enter the folder.
     os.chdir(fdir)
     # Loop through contents of folder
@@ -262,6 +268,8 @@ def UpdateDir(fdir, fdst, sudo=False):
             UpdateDir(f, fdsti, sudo=sudo)
         # Update the file
         UpdateFile(f, fdsti, sudo=sudo)
+    # Go back home.
+    os.chdir(fpwd)
     
 # Update scripts
 def UpdateScripts():
@@ -339,9 +347,28 @@ def UpdateJedit():
     # Child directories
     fjedit = os.path.join(fhome, '.jedit')
     fmodes = os.path.join(fjedit, 'modes')
-    fkeyms = os.path.join(fjedit, 'keymaps')
-    # Primary settings file
-    UpdateFile(
+    fkeys  = os.path.join(fjedit, 'keymaps')
+    fjars  = os.path.join(fjedit, 'jars')
+    # Local locations
+    f0 = os.path.join('jedit', '.jedit')
+    f1 = os.path.join('jedit', '.jedit', 'properties')
+    f2 = os.path.join('jedit', 'properties')
+    # Copy the main config file to a temp location.
+    shutil.copyfile(f1, f2)
+    # Long form of the destination directory.
+    fh2 = fhome.replace('/', '\/')
+    # Command to set the correct HOME directory.
+    cmd = ['sed', '-i', "s/\$HOME/%s/g"%fh2, f2]
+    # Update it.
+    sp.call(cmd)
+    # Update the file if appropriate.
+    UpdateFile(fh2, os.path.join(fjedit, 'properties'))
+    # Update the folders.
+    UpdateDir(os.path.join(f0,'modes'),   fmodes)
+    UpdateDir(os.path.join(f0,'keymaps'), fkeys)
+    UpdateDir(os.path.join(f0,'jars'),    fjars)
+    # Cleanup
+    os.remove(fh2)
     print(" ")
             
     
@@ -369,6 +396,10 @@ def main(*a, **kw):
     
     # Update scripts
     UpdateScripts()
+    
+    # Update programs
+    UpdateMatlab()
+    UpdateJedit()
     
         
         
